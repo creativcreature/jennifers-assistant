@@ -15,7 +15,7 @@ export default function Header() {
           </div>
           <div>
             <h1 className="font-display text-lg md:text-xl font-bold text-white">
-              Jennifer&apos;s Assistant
+              {process.env.NODE_ENV === 'development' ? 'X (Test Site)' : "Jennifer's Assistant"}
             </h1>
           </div>
         </div>

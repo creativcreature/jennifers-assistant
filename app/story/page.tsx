@@ -139,30 +139,76 @@ export default function StoryPage() {
   const handleSendEmail = async () => {
     setIsSending(true);
     try {
-      const response = await fetch('/api/send-story', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ responses }),
-      });
+      // Compile the story
+      const storyText = compileStory(responses);
 
-      if (response.ok) {
-        setEmailSent(true);
-        setMessages(prev => [...prev, {
-          id: 'sent',
-          role: 'assistant',
-          content: "Done! I've sent your story to your family member. They'll be in touch soon. 🏈\n\nIn the meantime, check out the Actions tab to see what steps you can take today."
-        }]);
-      } else {
-        throw new Error('Failed to send');
-      }
+      // Create mailto link
+      const recipient = 'c.parker3@me.com';
+      const subject = encodeURIComponent("🏈 Jennifer's Story - Please Read");
+      const body = encodeURIComponent(storyText);
+
+      // Open email client
+      window.location.href = `mailto:${recipient}?subject=${subject}&body=${body}`;
+
+      setEmailSent(true);
+      setMessages(prev => [...prev, {
+        id: 'sent',
+        role: 'assistant',
+        content: "I've opened your email app with the story ready to send. Just hit Send! 🏈\n\nIn the meantime, check out the Actions tab to see what steps you can take today."
+      }]);
     } catch {
       setMessages(prev => [...prev, {
         id: 'error',
         role: 'assistant',
-        content: "I had trouble sending that. Let's try again in a moment, or you can show this to your family member directly."
+        content: "I had trouble with that. Let's try again in a moment, or you can show this to your family member directly."
       }]);
     }
     setIsSending(false);
+  };
+
+  const compileStory = (responses: IntakeResponse[]): string => {
+    const byCategory: Record<string, IntakeResponse[]> = {};
+    responses.forEach(r => {
+      if (!byCategory[r.category]) byCategory[r.category] = [];
+      byCategory[r.category].push(r);
+    });
+
+    const categoryTitles: Record<string, string> = {
+      basics: 'BASIC INFORMATION',
+      situation: 'CURRENT SITUATION',
+      health: 'HEALTH & MEDICAL',
+      history: 'LIFE STORY',
+      falcons: 'THE ATLANTA FALCONS',
+      goals: 'GOALS & DREAMS',
+    };
+
+    const categoryOrder = ['basics', 'situation', 'health', 'history', 'falcons', 'goals'];
+
+    let story = "JENNIFER'S STORY\n";
+    story += "================\n\n";
+
+    for (const category of categoryOrder) {
+      const items = byCategory[category];
+      if (!items?.length) continue;
+
+      story += `${categoryTitles[category]}\n`;
+      story += "---\n";
+      for (const item of items) {
+        story += `Q: ${item.question}\n`;
+        story += `A: ${item.answer}\n\n`;
+      }
+      story += "\n";
+    }
+
+    story += "NEXT STEPS\n";
+    story += "---\n";
+    story += "1. Call 211 for SOAR worker\n";
+    story += "2. Apply for Presumptive SSI (qualifies due to amputation)\n";
+    story += "3. Get Grady Card: 404-616-1000\n";
+    story += "4. Apply for SNAP at gateway.ga.gov\n";
+    story += "\nFalcons Contact: community@atlantafalcons.com\n";
+
+    return story;
   };
 
   const handleStartOver = async () => {
