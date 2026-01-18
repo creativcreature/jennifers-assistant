@@ -25,7 +25,7 @@ export default function ActionsPage() {
           priority
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-[var(--bg-primary)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/70" />
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <h1 className="font-display text-2xl font-bold text-white drop-shadow-lg">
             Your Game Plan
