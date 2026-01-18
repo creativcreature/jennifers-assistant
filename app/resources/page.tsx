@@ -1,18 +1,30 @@
 'use client';
 
-import { useState } from 'react';
-import { RESOURCES, Resource } from '@/lib/resources';
+import { useState, useMemo } from 'react';
+import { RESOURCES, Resource, sortResourcesByDistance } from '@/lib/resources';
+import { useGeolocation } from '@/hooks/useGeolocation';
 import ResourceCard from '@/components/resources/ResourceCard';
 
 type ResourceType = 'all' | 'food' | 'healthcare' | 'services';
 
 export default function ResourcesPage() {
   const [filter, setFilter] = useState<ResourceType>('food');
+  const { location, loading: locationLoading, error: locationError, requestLocation } = useGeolocation();
 
-  const filteredResources = RESOURCES.filter((r) => {
-    if (filter === 'all') return true;
-    return r.type === filter;
-  });
+  // Filter and sort resources by distance
+  const filteredResources = useMemo(() => {
+    let resources = RESOURCES.filter((r) => {
+      if (filter === 'all') return true;
+      return r.type === filter;
+    });
+
+    // Sort by distance if we have location
+    if (location) {
+      resources = sortResourcesByDistance(resources, location.latitude, location.longitude);
+    }
+
+    return resources;
+  }, [filter, location]);
 
   const tabs: { key: ResourceType; label: string; icon: string }[] = [
     { key: 'food', label: 'Food', icon: '🍎' },
@@ -28,6 +40,31 @@ export default function ResourcesPage() {
         <p className="text-sm text-falcons-silver mt-1">
           Food, healthcare, and services in Atlanta
         </p>
+      </div>
+
+      {/* Location Status */}
+      <div className="px-4 mb-4">
+        {locationLoading && (
+          <div className="card p-3 text-sm text-falcons-silver flex items-center gap-2">
+            <div className="w-4 h-4 border-2 border-falcons-red border-t-transparent rounded-full animate-spin" />
+            Finding your location...
+          </div>
+        )}
+        {location && (
+          <div className="card p-3 text-sm text-success flex items-center gap-2">
+            <span>📍</span>
+            Showing nearest locations to you
+          </div>
+        )}
+        {locationError && !location && (
+          <button
+            onClick={requestLocation}
+            className="card p-3 text-sm text-warning flex items-center gap-2 w-full text-left"
+          >
+            <span>📍</span>
+            <span>Tap to enable location for nearby resources</span>
+          </button>
+        )}
       </div>
 
       {/* Filter Tabs */}
@@ -84,7 +121,11 @@ export default function ResourcesPage() {
           </div>
         ) : (
           filteredResources.map((resource) => (
-            <ResourceCard key={resource.id} resource={resource} />
+            <ResourceCard
+              key={resource.id}
+              resource={resource as Resource & { distance?: number }}
+              userLocation={location}
+            />
           ))
         )}
       </div>
