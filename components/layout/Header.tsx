@@ -7,23 +7,33 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-bg-dark/95 backdrop-blur-sm border-b border-falcons-silver/10 safe-top">
-      <div className="flex items-center justify-between px-4 py-3">
+      <div className="max-w-screen-lg mx-auto flex items-center justify-between px-4 py-3">
         <div className="flex items-center gap-3">
           {/* Falcons Logo */}
           <div className="w-10 h-10 bg-falcons-red rounded-full flex items-center justify-center">
             <span className="text-2xl">🏈</span>
           </div>
           <div>
-            <h1 className="font-display text-xl font-bold text-white">
+            <h1 className="font-display text-lg md:text-xl font-bold text-white">
               Jennifer&apos;s Assistant
             </h1>
           </div>
         </div>
 
-        {/* Menu Button */}
+        {/* Desktop navigation hint */}
+        <div className="hidden md:flex items-center gap-4 text-sm text-falcons-silver">
+          <a href="tel:211" className="hover:text-white transition-colors">
+            📞 Call 211
+          </a>
+          <a href="tel:911" className="hover:text-white transition-colors">
+            🚨 Emergency
+          </a>
+        </div>
+
+        {/* Mobile Menu Button */}
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="w-12 h-12 flex items-center justify-center text-falcons-silver hover:text-white transition-colors"
+          className="md:hidden w-12 h-12 flex items-center justify-center text-falcons-silver hover:text-white transition-colors"
           aria-label="Menu"
         >
           <svg
@@ -51,9 +61,9 @@ export default function Header() {
         </button>
       </div>
 
-      {/* Dropdown Menu */}
+      {/* Dropdown Menu (Mobile) */}
       {menuOpen && (
-        <div className="absolute top-full left-0 right-0 bg-bg-dark border-b border-falcons-silver/10 py-2">
+        <div className="md:hidden absolute top-full left-0 right-0 bg-bg-dark border-b border-falcons-silver/10 py-2">
           <a
             href="tel:911"
             className="flex items-center gap-3 px-4 py-3 text-lg text-white hover:bg-falcons-red/10"

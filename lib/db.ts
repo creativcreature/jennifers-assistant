@@ -57,6 +57,14 @@ export interface CaseNumber {
   notes?: string;
 }
 
+export interface IntakeResponse {
+  id: string;  // question id
+  question: string;
+  answer: string;
+  category: string;
+  answeredAt: Date;
+}
+
 export interface UserProfile {
   id: number;
   name: string;
@@ -82,18 +90,20 @@ class JennifersAssistantDB extends Dexie {
   contacts!: EntityTable<Contact, 'id'>;
   caseNumbers!: EntityTable<CaseNumber, 'id'>;
   profile!: EntityTable<UserProfile, 'id'>;
+  intakeResponses!: EntityTable<IntakeResponse, 'id'>;
 
   constructor() {
     super('JennifersAssistantDB');
 
-    this.version(1).stores({
+    this.version(2).stores({
       messages: '++id, role, timestamp, synced',
       actions: 'id, status, completedAt, priority',
       medications: '++id, name',
       appointments: '++id, date',
       contacts: '++id, name, role',
       caseNumbers: '++id, type',
-      profile: 'id'
+      profile: 'id',
+      intakeResponses: 'id, category, answeredAt'
     });
   }
 }
@@ -172,4 +182,36 @@ export async function getPendingActionsCount(): Promise<number> {
 // Get completed actions count
 export async function getCompletedActionsCount(): Promise<number> {
   return await db.actions.where('status').equals('done').count();
+}
+
+// Save intake response
+export async function saveIntakeResponse(
+  id: string,
+  question: string,
+  answer: string,
+  category: string
+): Promise<void> {
+  await db.intakeResponses.put({
+    id,
+    question,
+    answer,
+    category,
+    answeredAt: new Date(),
+  });
+}
+
+// Get all intake responses
+export async function getIntakeResponses(): Promise<IntakeResponse[]> {
+  return await db.intakeResponses.toArray();
+}
+
+// Get intake response by id
+export async function getIntakeResponse(id: string): Promise<IntakeResponse | undefined> {
+  return await db.intakeResponses.get(id);
+}
+
+// Get intake progress
+export async function getIntakeProgress(): Promise<{ answered: number; total: number }> {
+  const count = await db.intakeResponses.count();
+  return { answered: count, total: 24 }; // 24 questions total
 }
