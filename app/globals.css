@@ -6,27 +6,41 @@
 
 @layer base {
   :root {
-    /* Falcons Color System */
+    /* Light Mode Colors */
+    --bg-primary: #FAFAFA;
+    --bg-secondary: #FFFFFF;
+    --bg-surface: #F5F5F5;
+    --bg-elevated: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #4A4A4A;
+    --text-muted: #6B6B6B;
+    --border-color: rgba(0, 0, 0, 0.1);
+    --shadow-color: rgba(0, 0, 0, 0.1);
+
+    /* Falcons Colors */
     --falcons-red: #A71930;
     --falcons-red-dark: #8B1528;
-    --falcons-black: #000000;
+    --falcons-red-light: #C42339;
     --falcons-silver: #A5ACAF;
-    --falcons-white: #FFFFFF;
-
-    /* Extended Palette */
-    --red-glow: rgba(167, 25, 48, 0.3);
-    --cream: #F7F3ED;
     --gold: #C19A6B;
-    --gold-accessible: #8B6914;
 
-    /* Status Colors */
+    /* Status */
     --success: #2d6a4f;
     --warning: #e07b39;
     --info: #3d5a80;
+  }
 
-    /* Backgrounds */
-    --bg-dark: #0a0a0a;
-    --bg-card: rgba(255, 255, 255, 0.05);
+  .dark {
+    /* Dark Mode Colors (Spotify/Lightroom inspired) */
+    --bg-primary: #0A0A0A;
+    --bg-secondary: #181818;
+    --bg-surface: #1E1E1E;
+    --bg-elevated: #282828;
+    --text-primary: #FFFFFF;
+    --text-secondary: #B3B3B3;
+    --text-muted: #727272;
+    --border-color: rgba(255, 255, 255, 0.1);
+    --shadow-color: rgba(0, 0, 0, 0.5);
   }
 
   html {
@@ -36,9 +50,12 @@
   }
 
   body {
-    @apply bg-bg-dark text-white min-h-screen;
-    font-size: 22px;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 20px;
     line-height: 1.6;
+    min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   /* Accessibility - Larger touch targets */
@@ -54,132 +71,344 @@
 }
 
 @layer components {
-  /* Large accessible button */
+  /* ==================== BUTTONS ==================== */
   .btn-primary {
-    @apply bg-falcons-red text-white font-display font-semibold;
+    @apply font-display font-semibold;
     @apply px-6 py-4 rounded-card;
     @apply min-h-touch w-full;
-    @apply flex items-center justify-center;
+    @apply flex items-center justify-center gap-3;
     @apply transition-all duration-200;
-    @apply hover:bg-falcons-red-dark active:scale-[0.98];
-    @apply focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-falcons-black;
-    font-size: 20px;
+    @apply active:scale-[0.98];
+    background: linear-gradient(135deg, var(--falcons-red) 0%, var(--falcons-red-dark) 100%);
+    color: white;
+    font-size: 18px;
+    box-shadow: 0 4px 15px rgba(167, 25, 48, 0.3);
+  }
+
+  .btn-primary:hover {
+    box-shadow: 0 6px 25px rgba(167, 25, 48, 0.4);
+    transform: translateY(-1px);
   }
 
   .btn-secondary {
-    @apply bg-transparent text-white font-display font-semibold;
+    @apply font-display font-semibold;
     @apply px-6 py-4 rounded-card;
     @apply min-h-touch w-full;
-    @apply flex items-center justify-center;
-    @apply border-2 border-falcons-silver/30;
+    @apply flex items-center justify-center gap-3;
     @apply transition-all duration-200;
-    @apply hover:border-falcons-red hover:text-falcons-red active:scale-[0.98];
-    font-size: 20px;
+    @apply active:scale-[0.98];
+    background-color: var(--bg-elevated);
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+    font-size: 18px;
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--falcons-red);
+    color: var(--falcons-red);
   }
 
   .btn-call {
-    @apply bg-success text-white font-display font-semibold;
+    @apply font-display font-semibold;
     @apply px-6 py-4 rounded-card;
     @apply min-h-touch;
     @apply flex items-center justify-center gap-3;
     @apply transition-all duration-200;
-    @apply hover:opacity-90 active:scale-[0.98];
-    font-size: 20px;
+    @apply active:scale-[0.98];
+    background: linear-gradient(135deg, var(--success) 0%, #236B47 100%);
+    color: white;
+    font-size: 18px;
+    box-shadow: 0 4px 15px rgba(45, 106, 79, 0.3);
   }
 
-  /* Card component */
+  .btn-call:hover {
+    box-shadow: 0 6px 25px rgba(45, 106, 79, 0.4);
+    transform: translateY(-1px);
+  }
+
+  /* ==================== CARDS ==================== */
   .card {
-    @apply bg-bg-card backdrop-blur-sm;
-    @apply rounded-card p-5;
-    @apply border border-falcons-silver/10;
+    background-color: var(--bg-secondary);
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    transition: all 0.2s ease;
   }
 
   .card-elevated {
-    @apply card;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    background-color: var(--bg-elevated);
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 20px var(--shadow-color);
+    transition: all 0.2s ease;
   }
 
-  /* Message bubbles */
+  .card-elevated:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px var(--shadow-color);
+  }
+
+  .card-hero {
+    @apply relative overflow-hidden rounded-card-lg;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+  }
+
+  .card-hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.8) 100%);
+    pointer-events: none;
+  }
+
+  /* ==================== MESSAGE BUBBLES ==================== */
   .message-ai {
-    @apply bg-falcons-red/10 border border-falcons-red/20;
-    @apply rounded-card rounded-tl-sm;
-    @apply p-5;
+    @apply rounded-card rounded-tl-sm p-5;
+    background: linear-gradient(135deg, rgba(167, 25, 48, 0.15) 0%, rgba(167, 25, 48, 0.05) 100%);
+    border: 1px solid rgba(167, 25, 48, 0.2);
+  }
+
+  .dark .message-ai {
+    background: linear-gradient(135deg, rgba(167, 25, 48, 0.2) 0%, rgba(167, 25, 48, 0.1) 100%);
   }
 
   .message-user {
-    @apply bg-falcons-silver/10 border border-falcons-silver/20;
-    @apply rounded-card rounded-tr-sm;
-    @apply p-5;
+    @apply rounded-card rounded-tr-sm p-5;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
   }
 
-  /* Input fields */
+  .dark .message-user {
+    background-color: var(--bg-elevated);
+  }
+
+  /* ==================== INPUT FIELDS ==================== */
   .input-field {
-    @apply bg-bg-card border border-falcons-silver/20;
     @apply rounded-card px-5 py-4;
-    @apply text-base text-white placeholder:text-falcons-silver/50;
     @apply min-h-touch w-full;
-    @apply focus:border-falcons-red focus:ring-1 focus:ring-falcons-red;
     @apply transition-all duration-200;
+    background-color: var(--bg-surface);
+    border: 2px solid var(--border-color);
+    color: var(--text-primary);
+    font-size: 18px;
   }
 
-  /* Navigation */
+  .input-field::placeholder {
+    color: var(--text-muted);
+  }
+
+  .input-field:focus {
+    border-color: var(--falcons-red);
+    box-shadow: 0 0 0 3px rgba(167, 25, 48, 0.1);
+  }
+
+  .dark .input-field {
+    background-color: var(--bg-elevated);
+  }
+
+  /* ==================== NAVIGATION ==================== */
   .nav-item {
     @apply flex flex-col items-center justify-center;
-    @apply text-falcons-silver transition-colors duration-200;
-    @apply min-h-touch min-w-[64px];
-    font-size: 14px;
+    @apply min-h-touch min-w-[72px] px-2;
+    @apply transition-all duration-200;
+    color: var(--text-muted);
+    font-size: 12px;
   }
 
   .nav-item.active {
-    @apply text-falcons-red;
+    color: var(--falcons-red);
   }
 
   .nav-item:hover {
-    @apply text-white;
+    color: var(--text-primary);
   }
 
-  /* Status badges */
+  .nav-icon {
+    @apply w-7 h-7 mb-1;
+    transition: transform 0.2s ease;
+  }
+
+  .nav-item:hover .nav-icon {
+    transform: scale(1.1);
+  }
+
+  .nav-item.active .nav-icon {
+    transform: scale(1.15);
+  }
+
+  /* ==================== STATUS BADGES ==================== */
+  .badge {
+    @apply px-3 py-1 rounded-full text-sm font-semibold inline-flex items-center gap-1;
+  }
+
   .badge-success {
-    @apply bg-success/20 text-success px-3 py-1 rounded-full text-sm font-medium;
+    @apply badge;
+    background: rgba(45, 106, 79, 0.15);
+    color: var(--success);
+  }
+
+  .dark .badge-success {
+    background: rgba(45, 106, 79, 0.25);
+    color: #5cba8a;
   }
 
   .badge-warning {
-    @apply bg-warning/20 text-warning px-3 py-1 rounded-full text-sm font-medium;
+    @apply badge;
+    background: rgba(224, 123, 57, 0.15);
+    color: var(--warning);
+  }
+
+  .dark .badge-warning {
+    background: rgba(224, 123, 57, 0.25);
+    color: #f4a261;
   }
 
   .badge-info {
-    @apply bg-info/20 text-info px-3 py-1 rounded-full text-sm font-medium;
+    @apply badge;
+    background: rgba(61, 90, 128, 0.15);
+    color: var(--info);
+  }
+
+  .dark .badge-info {
+    background: rgba(61, 90, 128, 0.25);
+    color: #6b9ac4;
   }
 
   .badge-pending {
-    @apply bg-falcons-silver/20 text-falcons-silver px-3 py-1 rounded-full text-sm font-medium;
+    @apply badge;
+    background: rgba(165, 172, 175, 0.15);
+    color: var(--text-muted);
   }
 
-  /* Offline indicator */
-  .offline-banner {
-    @apply bg-warning/90 text-white;
-    @apply px-4 py-3 text-center;
-    @apply font-medium text-sm;
+  /* ==================== HERO SECTIONS ==================== */
+  .hero-section {
+    @apply relative overflow-hidden;
+    min-height: 200px;
   }
 
-  /* Quick action buttons */
+  .hero-image {
+    @apply absolute inset-0 w-full h-full object-cover;
+  }
+
+  .hero-overlay {
+    @apply absolute inset-0;
+    background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.7) 100%);
+  }
+
+  .hero-content {
+    @apply relative z-10 p-6 flex flex-col justify-end h-full;
+  }
+
+  /* ==================== STATS & DATA DISPLAY ==================== */
+  .stat-card {
+    @apply text-center p-4 rounded-card;
+    background-color: var(--bg-surface);
+  }
+
+  .stat-value {
+    @apply font-display text-2xl font-bold;
+    color: var(--falcons-red);
+  }
+
+  .stat-label {
+    @apply text-sm;
+    color: var(--text-muted);
+  }
+
+  /* ==================== PLAYER CARD (Fantasy Football style) ==================== */
+  .player-card {
+    @apply relative overflow-hidden rounded-card;
+    background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-surface) 100%);
+    border: 1px solid var(--border-color);
+  }
+
+  .player-card-header {
+    @apply px-4 py-3;
+    background: linear-gradient(135deg, var(--falcons-red) 0%, var(--falcons-red-dark) 100%);
+  }
+
+  .player-card-body {
+    @apply p-4;
+  }
+
+  /* ==================== QUICK ACTIONS ==================== */
   .quick-action {
-    @apply bg-bg-card border border-falcons-silver/20;
     @apply rounded-card px-5 py-4;
-    @apply text-base text-white;
     @apply min-h-touch w-full text-left;
     @apply transition-all duration-200;
-    @apply hover:border-falcons-red hover:bg-falcons-red/5;
     @apply active:scale-[0.98];
+    @apply flex items-center gap-4;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    font-size: 18px;
   }
 
-  /* Progress bar */
+  .quick-action:hover {
+    border-color: var(--falcons-red);
+    background: linear-gradient(135deg, rgba(167, 25, 48, 0.05) 0%, transparent 100%);
+  }
+
+  .dark .quick-action {
+    background-color: var(--bg-elevated);
+  }
+
+  /* ==================== PROGRESS BAR ==================== */
   .progress-bar {
-    @apply h-2 bg-falcons-silver/20 rounded-full overflow-hidden;
+    @apply h-3 rounded-full overflow-hidden;
+    background-color: var(--bg-surface);
   }
 
   .progress-fill {
-    @apply h-full bg-falcons-red transition-all duration-500;
+    @apply h-full rounded-full transition-all duration-500;
+    background: linear-gradient(90deg, var(--falcons-red) 0%, var(--falcons-red-light) 100%);
+  }
+
+  /* ==================== LIST ITEMS (Spotify style) ==================== */
+  .list-item {
+    @apply flex items-center gap-4 p-3 rounded-card;
+    @apply transition-all duration-200;
+    @apply cursor-pointer;
+  }
+
+  .list-item:hover {
+    background-color: var(--bg-surface);
+  }
+
+  .dark .list-item:hover {
+    background-color: var(--bg-elevated);
+  }
+
+  .list-item-thumbnail {
+    @apply w-14 h-14 rounded-lg object-cover flex-shrink-0;
+    background-color: var(--bg-surface);
+  }
+
+  /* ==================== OFFLINE BANNER ==================== */
+  .offline-banner {
+    @apply px-4 py-3 text-center font-medium text-sm;
+    background: linear-gradient(90deg, var(--warning) 0%, #d06b2b 100%);
+    color: white;
+  }
+
+  /* ==================== SECTION HEADERS ==================== */
+  .section-header {
+    @apply font-display text-lg font-bold mb-4;
+    color: var(--text-primary);
+  }
+
+  .section-subheader {
+    @apply text-sm mb-6;
+    color: var(--text-secondary);
+  }
+
+  /* ==================== DIVIDERS ==================== */
+  .divider {
+    @apply my-6;
+    height: 1px;
+    background-color: var(--border-color);
   }
 }
 
@@ -200,5 +429,54 @@
 
   .safe-top {
     padding-top: max(16px, env(safe-area-inset-top));
+  }
+
+  /* Text colors using CSS variables */
+  .text-primary {
+    color: var(--text-primary);
+  }
+
+  .text-secondary {
+    color: var(--text-secondary);
+  }
+
+  .text-muted {
+    color: var(--text-muted);
+  }
+
+  /* Background colors using CSS variables */
+  .bg-primary {
+    background-color: var(--bg-primary);
+  }
+
+  .bg-secondary {
+    background-color: var(--bg-secondary);
+  }
+
+  .bg-surface {
+    background-color: var(--bg-surface);
+  }
+
+  .bg-elevated {
+    background-color: var(--bg-elevated);
+  }
+
+  /* Glassmorphism effect */
+  .glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .dark .glass {
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    background: linear-gradient(135deg, var(--falcons-red) 0%, #ff4d6d 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 }

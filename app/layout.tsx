@@ -3,6 +3,7 @@ import "./globals.css";
 import Navigation from "@/components/layout/Navigation";
 import Header from "@/components/layout/Header";
 import OfflineIndicator from "@/components/layout/OfflineIndicator";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 export const metadata: Metadata = {
   title: "Jennifer's Assistant",
@@ -29,19 +30,35 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var theme = localStorage.getItem('theme');
+                  if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
       </head>
-      <body className="flex flex-col min-h-screen bg-bg-dark">
-        <OfflineIndicator />
-        <Header />
-        <main className="flex-1 overflow-auto pb-20 max-w-screen-lg mx-auto w-full">
-          {children}
-        </main>
-        <Navigation />
+      <body className="flex flex-col min-h-screen bg-primary transition-colors duration-300">
+        <ThemeProvider>
+          <OfflineIndicator />
+          <Header />
+          <main className="flex-1 overflow-auto pb-24 max-w-screen-lg mx-auto w-full">
+            {children}
+          </main>
+          <Navigation />
+        </ThemeProvider>
       </body>
     </html>
   );

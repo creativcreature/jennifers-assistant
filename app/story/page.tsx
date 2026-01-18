@@ -2,6 +2,7 @@
 
 import { useChat } from 'ai/react';
 import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import Button from '@/components/ui/Button';
 import { STORY_INITIAL_MESSAGE } from '@/lib/story-prompt';
@@ -69,10 +70,6 @@ export default function StoryPage() {
     story += "SUMMARY FOR HELPER\n";
     story += "========================================\n\n";
 
-    // Extract key info from Jennifer's responses
-    const jenniferMessages = messages.filter(m => m.role === 'user').map(m => m.content);
-    const allText = jenniferMessages.join(' ').toLowerCase();
-
     story += "KEY INFORMATION SHARED:\n";
     story += "- Review the conversation above for Jennifer's full story\n";
     story += "- Pay special attention to her Falcons memories and what they mean to her\n";
@@ -101,7 +98,7 @@ export default function StoryPage() {
       const storyText = compileStoryFromMessages();
 
       const recipient = 'c.parker3@me.com';
-      const subject = encodeURIComponent("🏈 Jennifer's Story - Please Read");
+      const subject = encodeURIComponent("Jennifer's Story - Please Read");
       const body = encodeURIComponent(storyText);
 
       window.location.href = `mailto:${recipient}?subject=${subject}&body=${body}`;
@@ -121,29 +118,42 @@ export default function StoryPage() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-140px)]">
-      {/* Header */}
-      <div className="px-4 py-3 border-b border-falcons-silver/10">
-        <h1 className="font-display text-lg font-bold text-white">Share Your Story 🏈</h1>
-        <p className="text-sm text-falcons-silver">
-          {messages.length <= 2
-            ? "Take your time - I'm here to listen"
-            : `${messages.filter(m => m.role === 'user').length} messages shared`}
-        </p>
+      {/* Hero Section with Player Image */}
+      <div className="relative h-48 overflow-hidden">
+        <Image
+          src="/images/falcons/matt-ryan-julio-jones.jpg"
+          alt="Matt Ryan and Julio Jones celebrating"
+          fill
+          className="object-cover object-top"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[var(--bg-primary)]" />
+        <div className="absolute bottom-0 left-0 right-0 p-4">
+          <h1 className="font-display text-2xl font-bold text-white drop-shadow-lg">
+            Share Your Story
+          </h1>
+          <p className="text-white/90 text-sm drop-shadow">
+            {messages.length <= 2
+              ? "Take your time - I'm here to listen"
+              : `${messages.filter(m => m.role === 'user').length} messages shared`}
+          </p>
+        </div>
       </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 scrollbar-hide">
-        {messages.map((message) => (
+        {messages.map((message, index) => (
           <div
             key={message.id}
-            className={`max-w-[90%] ${message.role === 'assistant' ? 'self-start' : 'self-end ml-auto'}`}
+            className={`max-w-[90%] animate-slide-up ${message.role === 'assistant' ? 'self-start' : 'self-end ml-auto'}`}
+            style={{ animationDelay: `${index * 0.05}s` }}
           >
             <div className={message.role === 'assistant' ? 'message-ai' : 'message-user'}>
               <div className="text-base leading-relaxed whitespace-pre-wrap">
                 {message.content}
               </div>
             </div>
-            <div className={`text-xs text-falcons-silver/60 mt-1 ${message.role === 'assistant' ? 'text-left' : 'text-right'}`}>
+            <div className={`text-xs text-muted mt-2 ${message.role === 'assistant' ? 'text-left' : 'text-right'}`}>
               {message.role === 'assistant' ? 'Interviewer' : 'Jennifer'}
             </div>
           </div>
@@ -151,12 +161,12 @@ export default function StoryPage() {
 
         {/* Loading indicator */}
         {isLoading && (
-          <div className="self-start max-w-[90%]">
+          <div className="self-start max-w-[90%] animate-fade-in">
             <div className="message-ai">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-falcons-red rounded-full animate-bounce" />
-                <div className="w-2 h-2 bg-falcons-red rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
-                <div className="w-2 h-2 bg-falcons-red rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+              <div className="flex items-center gap-3">
+                <div className="w-2.5 h-2.5 bg-falcons-red rounded-full animate-bounce" />
+                <div className="w-2.5 h-2.5 bg-falcons-red rounded-full animate-bounce" style={{ animationDelay: '0.15s' }} />
+                <div className="w-2.5 h-2.5 bg-falcons-red rounded-full animate-bounce" style={{ animationDelay: '0.3s' }} />
               </div>
             </div>
           </div>
@@ -164,13 +174,16 @@ export default function StoryPage() {
 
         {/* Send Story Button */}
         {showSendButton && !emailSent && !isLoading && (
-          <div className="pt-4 space-y-3">
-            <div className="card p-4 text-center">
-              <p className="text-sm text-falcons-silver mb-3">
-                Ready to share your story?
+          <div className="pt-4 space-y-3 animate-slide-up">
+            <div className="card-elevated p-5 text-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, var(--falcons-red) 0%, var(--falcons-red-dark) 100%)' }}>
+                <span className="text-3xl">📧</span>
+              </div>
+              <p className="text-secondary mb-4">
+                Ready to share your story with someone who can help?
               </p>
               <Button onClick={handleSendEmail} disabled={isSendingEmail}>
-                {isSendingEmail ? 'Opening email...' : '📧 Send My Story'}
+                {isSendingEmail ? 'Opening email...' : 'Send My Story'}
               </Button>
             </div>
           </div>
@@ -178,9 +191,12 @@ export default function StoryPage() {
 
         {/* Email sent confirmation */}
         {emailSent && (
-          <div className="card p-4 text-center bg-success/20 border-success">
-            <p className="text-success font-semibold">Story ready to send!</p>
-            <p className="text-sm text-falcons-silver mt-1">
+          <div className="card-elevated p-5 text-center animate-slide-up" style={{ borderColor: 'var(--success)' }}>
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center bg-success/20">
+              <span className="text-3xl">✓</span>
+            </div>
+            <p className="font-semibold text-success">Story ready to send!</p>
+            <p className="text-sm text-secondary mt-2">
               Your email app should be open. Just tap Send!
             </p>
           </div>
@@ -190,10 +206,11 @@ export default function StoryPage() {
       </div>
 
       {/* Input */}
-      <div className="border-t border-falcons-silver/10 p-4 bg-bg-dark/95 backdrop-blur-sm">
+      <div className="border-t border-[var(--border-color)] p-4 glass">
         {!isOnline && (
-          <div className="mb-3 p-3 bg-warning/20 rounded-card text-warning text-sm text-center">
-            You&apos;re offline. Story sharing needs internet.
+          <div className="mb-3 p-4 rounded-card bg-warning/10 border border-warning/30 text-center">
+            <span className="text-warning font-medium">You&apos;re offline</span>
+            <span className="text-secondary block text-sm mt-1">Story sharing needs internet</span>
           </div>
         )}
 
@@ -215,7 +232,10 @@ export default function StoryPage() {
           <button
             type="submit"
             disabled={!input.trim() || isLoading || !isOnline}
-            className="w-14 h-14 bg-falcons-red rounded-card flex items-center justify-center disabled:opacity-50 transition-opacity self-end"
+            className="w-14 h-14 rounded-card flex items-center justify-center disabled:opacity-50 transition-all duration-200 hover:shadow-glow-sm active:scale-95 self-end"
+            style={{
+              background: 'linear-gradient(135deg, var(--falcons-red) 0%, var(--falcons-red-dark) 100%)',
+            }}
           >
             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -225,7 +245,7 @@ export default function StoryPage() {
 
         {/* Show send button hint after some messages */}
         {messages.length >= 6 && messages.length < 12 && !showSendButton && (
-          <p className="text-xs text-falcons-silver/50 text-center mt-2">
+          <p className="text-xs text-muted text-center mt-3">
             Keep sharing - the &quot;Send&quot; button will appear when ready
           </p>
         )}

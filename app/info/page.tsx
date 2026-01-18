@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 
 const MedicationTracker = dynamic(() => import('@/components/info/MedicationTracker'), {
   ssr: false,
@@ -29,34 +30,52 @@ export default function InfoPage() {
   ];
 
   return (
-    <div className="py-4">
-      <div className="px-4 mb-6">
-        <h1 className="font-display text-2xl font-bold text-white">My Info</h1>
-        <p className="text-sm text-falcons-silver mt-1">
-          Track your medications, appointments, and contacts
-        </p>
+    <div className="pb-4">
+      {/* Hero Section */}
+      <div className="relative h-40 overflow-hidden">
+        <Image
+          src="/images/falcons/michael-vick.jpg"
+          alt="Michael Vick"
+          fill
+          className="object-cover object-top"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[var(--bg-primary)]" />
+        <div className="absolute bottom-0 left-0 right-0 p-4">
+          <h1 className="font-display text-2xl font-bold text-white drop-shadow-lg">
+            My Info
+          </h1>
+          <p className="text-white/90 text-sm drop-shadow">
+            Track medications, appointments, and contacts
+          </p>
+        </div>
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex gap-2 px-4 mb-6 overflow-x-auto scrollbar-hide">
+      <div className="flex gap-2 px-4 py-4 overflow-x-auto scrollbar-hide">
         {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`flex items-center gap-2 px-4 py-3 rounded-card text-sm font-medium whitespace-nowrap transition-colors ${
+            className={`flex items-center gap-2 px-5 py-3 rounded-card text-sm font-semibold whitespace-nowrap transition-all duration-200 ${
               activeTab === tab.key
-                ? 'bg-falcons-red text-white'
-                : 'bg-bg-card text-falcons-silver hover:text-white'
+                ? 'text-white shadow-glow-sm'
+                : 'text-secondary hover:text-primary'
             }`}
+            style={{
+              background: activeTab === tab.key
+                ? 'linear-gradient(135deg, var(--falcons-red) 0%, var(--falcons-red-dark) 100%)'
+                : 'var(--bg-surface)',
+            }}
           >
-            <span>{tab.icon}</span>
+            <span className="text-lg">{tab.icon}</span>
             {tab.label}
           </button>
         ))}
       </div>
 
       {/* Tab Content */}
-      <div className="px-4 pb-4">
+      <div className="px-4 pb-4 animate-fade-in" key={activeTab}>
         {activeTab === 'meds' && <MedicationTracker />}
         {activeTab === 'appointments' && <AppointmentList />}
         {activeTab === 'contacts' && <ContactList />}
