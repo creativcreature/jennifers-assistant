@@ -1,241 +1,134 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { db, saveIntakeResponse, getIntakeResponses, IntakeResponse } from '@/lib/db';
-import { INTAKE_QUESTIONS, CATEGORY_INTROS, getCategoryOrder } from '@/lib/intake-questions';
+import { useChat } from 'ai/react';
+import { useEffect, useRef, useState } from 'react';
+import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import Button from '@/components/ui/Button';
-
-interface ChatMessage {
-  id: string;
-  role: 'assistant' | 'user';
-  content: string;
-  questionId?: string;
-}
+import { STORY_INITIAL_MESSAGE } from '@/lib/story-prompt';
 
 export default function StoryPage() {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [input, setInput] = useState('');
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [isComplete, setIsComplete] = useState(false);
-  const [isSending, setIsSending] = useState(false);
-  const [emailSent, setEmailSent] = useState(false);
-  const [responses, setResponses] = useState<IntakeResponse[]>([]);
+  const isOnline = useOnlineStatus();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [showSendButton, setShowSendButton] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
 
-  // Load existing responses on mount
-  useEffect(() => {
-    async function loadResponses() {
-      const existing = await getIntakeResponses();
-      setResponses(existing);
-
-      // Find where we left off
-      const answeredIds = new Set(existing.map(r => r.id));
-      const nextUnanswered = INTAKE_QUESTIONS.findIndex(q => !answeredIds.has(q.id));
-
-      if (nextUnanswered === -1) {
-        // All questions answered
-        setIsComplete(true);
-        setMessages([{
-          id: 'complete',
-          role: 'assistant',
-          content: "You've already shared your story with me. Would you like to send it to your family member, or start over?"
-        }]);
-      } else {
-        setCurrentQuestionIndex(nextUnanswered);
-        // Start with welcome or resume message
-        const startMessage = nextUnanswered === 0
-          ? "Hi Jennifer! 🏈 I'd love to hear your story. This will help us find the best resources for you, and write a letter to the Falcons organization. Take your time - there's no rush.\n\nLet's start with some basics about you."
-          : "Welcome back! Let's continue where we left off.";
-
-        setMessages([
-          { id: 'welcome', role: 'assistant', content: startMessage },
-          { id: `q-${INTAKE_QUESTIONS[nextUnanswered].id}`, role: 'assistant', content: INTAKE_QUESTIONS[nextUnanswered].question, questionId: INTAKE_QUESTIONS[nextUnanswered].id }
-        ]);
+  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
+    api: '/api/story-chat',
+    initialMessages: [
+      {
+        id: 'welcome',
+        role: 'assistant',
+        content: STORY_INITIAL_MESSAGE,
+      },
+    ],
+    onFinish: (message) => {
+      // Show send button after enough conversation or when AI signals wrap-up
+      if (messages.length >= 10 ||
+          message.content.toLowerCase().includes('send my story') ||
+          message.content.toLowerCase().includes('ready to send')) {
+        setShowSendButton(true);
       }
-    }
-    loadResponses();
-  }, []);
+    },
+  });
 
   // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isComplete) return;
-
-    const currentQuestion = INTAKE_QUESTIONS[currentQuestionIndex];
-    const userMessage: ChatMessage = {
-      id: `user-${Date.now()}`,
-      role: 'user',
-      content: input.trim(),
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    setInput('');
-
-    // Save response to database
-    await saveIntakeResponse(
-      currentQuestion.id,
-      currentQuestion.question,
-      input.trim(),
-      currentQuestion.category
-    );
-
-    // Update local responses
-    setResponses(prev => [...prev, {
-      id: currentQuestion.id,
-      question: currentQuestion.question,
-      answer: input.trim(),
-      category: currentQuestion.category,
-      answeredAt: new Date(),
-    }]);
-
-    // Move to next question
-    const nextIndex = currentQuestionIndex + 1;
-
-    if (nextIndex >= INTAKE_QUESTIONS.length) {
-      // All done!
-      setIsComplete(true);
-      setTimeout(() => {
-        setMessages(prev => [...prev, {
-          id: 'done',
-          role: 'assistant',
-          content: "Thank you so much for sharing your story with me, Jennifer. 🏈❤️\n\nYour story is powerful and I know it will touch hearts. Would you like me to send this to your family member now?"
-        }]);
-      }, 500);
-    } else {
-      const nextQuestion = INTAKE_QUESTIONS[nextIndex];
-      const currentCategory = currentQuestion.category;
-      const nextCategory = nextQuestion.category;
-
-      setTimeout(() => {
-        const newMessages: ChatMessage[] = [];
-
-        // Add category intro if changing categories
-        if (currentCategory !== nextCategory) {
-          newMessages.push({
-            id: `intro-${nextCategory}`,
-            role: 'assistant',
-            content: CATEGORY_INTROS[nextCategory],
-          });
-        }
-
-        // Add the next question
-        newMessages.push({
-          id: `q-${nextQuestion.id}`,
-          role: 'assistant',
-          content: nextQuestion.question,
-          questionId: nextQuestion.id,
-        });
-
-        setMessages(prev => [...prev, ...newMessages]);
-        setCurrentQuestionIndex(nextIndex);
-      }, 500);
+  // Show send button after meaningful conversation
+  useEffect(() => {
+    if (messages.length >= 12) {
+      setShowSendButton(true);
     }
-  };
+  }, [messages.length]);
 
-  const handleSendEmail = async () => {
-    setIsSending(true);
-    try {
-      // Compile the story
-      const storyText = compileStory(responses);
-
-      // Create mailto link
-      const recipient = 'c.parker3@me.com';
-      const subject = encodeURIComponent("🏈 Jennifer's Story - Please Read");
-      const body = encodeURIComponent(storyText);
-
-      // Open email client
-      window.location.href = `mailto:${recipient}?subject=${subject}&body=${body}`;
-
-      setEmailSent(true);
-      setMessages(prev => [...prev, {
-        id: 'sent',
-        role: 'assistant',
-        content: "I've opened your email app with the story ready to send. Just hit Send! 🏈\n\nIn the meantime, check out the Actions tab to see what steps you can take today."
-      }]);
-    } catch {
-      setMessages(prev => [...prev, {
-        id: 'error',
-        role: 'assistant',
-        content: "I had trouble with that. Let's try again in a moment, or you can show this to your family member directly."
-      }]);
-    }
-    setIsSending(false);
-  };
-
-  const compileStory = (responses: IntakeResponse[]): string => {
-    const byCategory: Record<string, IntakeResponse[]> = {};
-    responses.forEach(r => {
-      if (!byCategory[r.category]) byCategory[r.category] = [];
-      byCategory[r.category].push(r);
-    });
-
-    const categoryTitles: Record<string, string> = {
-      basics: 'BASIC INFORMATION',
-      situation: 'CURRENT SITUATION',
-      health: 'HEALTH & MEDICAL',
-      history: 'LIFE STORY',
-      falcons: 'THE ATLANTA FALCONS',
-      goals: 'GOALS & DREAMS',
-    };
-
-    const categoryOrder = ['basics', 'situation', 'health', 'history', 'falcons', 'goals'];
-
+  const compileStoryFromMessages = (): string => {
     let story = "JENNIFER'S STORY\n";
-    story += "================\n\n";
+    story += "================\n";
+    story += `Collected on ${new Date().toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })}\n\n`;
 
-    for (const category of categoryOrder) {
-      const items = byCategory[category];
-      if (!items?.length) continue;
+    story += "CONVERSATION\n";
+    story += "------------\n\n";
 
-      story += `${categoryTitles[category]}\n`;
-      story += "---\n";
-      for (const item of items) {
-        story += `Q: ${item.question}\n`;
-        story += `A: ${item.answer}\n\n`;
+    for (const msg of messages) {
+      if (msg.role === 'assistant') {
+        story += `Interviewer: ${msg.content}\n\n`;
+      } else {
+        story += `Jennifer: ${msg.content}\n\n`;
       }
-      story += "\n";
     }
 
-    story += "NEXT STEPS\n";
+    story += "\n========================================\n";
+    story += "SUMMARY FOR HELPER\n";
+    story += "========================================\n\n";
+
+    // Extract key info from Jennifer's responses
+    const jenniferMessages = messages.filter(m => m.role === 'user').map(m => m.content);
+    const allText = jenniferMessages.join(' ').toLowerCase();
+
+    story += "KEY INFORMATION SHARED:\n";
+    story += "- Review the conversation above for Jennifer's full story\n";
+    story += "- Pay special attention to her Falcons memories and what they mean to her\n";
+    story += "- Note any specific needs or requests she mentioned\n\n";
+
+    story += "RECOMMENDED NEXT STEPS:\n";
+    story += "1. Call 211 to get Jennifer connected with a SOAR worker\n";
+    story += "2. Apply for Presumptive SSI (she qualifies due to leg amputation)\n";
+    story += "3. Get Grady Card for free medical care: 404-616-1000\n";
+    story += "4. Apply for expedited SNAP at gateway.ga.gov\n\n";
+
+    story += "ATLANTA FALCONS OUTREACH:\n";
+    story += "- Community Relations: community@atlantafalcons.com\n";
+    story += "- Atlanta Falcons: (470) 341-4500\n";
+    story += "- Arthur Blank Family Foundation\n\n";
+
     story += "---\n";
-    story += "1. Call 211 for SOAR worker\n";
-    story += "2. Apply for Presumptive SSI (qualifies due to amputation)\n";
-    story += "3. Get Grady Card: 404-616-1000\n";
-    story += "4. Apply for SNAP at gateway.ga.gov\n";
-    story += "\nFalcons Contact: community@atlantafalcons.com\n";
+    story += "Generated by Jennifer's Assistant\n";
 
     return story;
   };
 
-  const handleStartOver = async () => {
-    await db.intakeResponses.clear();
-    setResponses([]);
-    setCurrentQuestionIndex(0);
-    setIsComplete(false);
-    setEmailSent(false);
-    setMessages([
-      { id: 'welcome', role: 'assistant', content: "Let's start fresh! I'd love to hear your story. 🏈\n\n" + CATEGORY_INTROS['basics'] },
-      { id: `q-${INTAKE_QUESTIONS[0].id}`, role: 'assistant', content: INTAKE_QUESTIONS[0].question, questionId: INTAKE_QUESTIONS[0].id }
-    ]);
+  const handleSendEmail = async () => {
+    setIsSendingEmail(true);
+    try {
+      const storyText = compileStoryFromMessages();
+
+      const recipient = 'c.parker3@me.com';
+      const subject = encodeURIComponent("🏈 Jennifer's Story - Please Read");
+      const body = encodeURIComponent(storyText);
+
+      window.location.href = `mailto:${recipient}?subject=${subject}&body=${body}`;
+
+      setEmailSent(true);
+    } catch (error) {
+      console.error('Error sending email:', error);
+    }
+    setIsSendingEmail(false);
   };
 
-  const progress = Math.round((responses.length / INTAKE_QUESTIONS.length) * 100);
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!input.trim() || isLoading) return;
+    handleSubmit(e);
+  };
 
   return (
     <div className="flex flex-col h-[calc(100vh-140px)]">
-      {/* Progress bar */}
+      {/* Header */}
       <div className="px-4 py-3 border-b border-falcons-silver/10">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-falcons-silver">Your Story</span>
-          <span className="text-sm font-semibold text-white">{responses.length} of {INTAKE_QUESTIONS.length}</span>
-        </div>
-        <div className="progress-bar">
-          <div className="progress-fill" style={{ width: `${progress}%` }} />
-        </div>
+        <h1 className="font-display text-lg font-bold text-white">Share Your Story 🏈</h1>
+        <p className="text-sm text-falcons-silver">
+          {messages.length <= 2
+            ? "Take your time - I'm here to listen"
+            : `${messages.filter(m => m.role === 'user').length} messages shared`}
+        </p>
       </div>
 
       {/* Messages */}
@@ -250,18 +143,46 @@ export default function StoryPage() {
                 {message.content}
               </div>
             </div>
+            <div className={`text-xs text-falcons-silver/60 mt-1 ${message.role === 'assistant' ? 'text-left' : 'text-right'}`}>
+              {message.role === 'assistant' ? 'Interviewer' : 'Jennifer'}
+            </div>
           </div>
         ))}
 
-        {/* Action buttons when complete */}
-        {isComplete && !emailSent && (
-          <div className="space-y-3 pt-4">
-            <Button onClick={handleSendEmail} disabled={isSending}>
-              {isSending ? 'Sending...' : 'Send My Story'}
-            </Button>
-            <Button variant="secondary" onClick={handleStartOver}>
-              Start Over
-            </Button>
+        {/* Loading indicator */}
+        {isLoading && (
+          <div className="self-start max-w-[90%]">
+            <div className="message-ai">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-falcons-red rounded-full animate-bounce" />
+                <div className="w-2 h-2 bg-falcons-red rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
+                <div className="w-2 h-2 bg-falcons-red rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Send Story Button */}
+        {showSendButton && !emailSent && !isLoading && (
+          <div className="pt-4 space-y-3">
+            <div className="card p-4 text-center">
+              <p className="text-sm text-falcons-silver mb-3">
+                Ready to share your story?
+              </p>
+              <Button onClick={handleSendEmail} disabled={isSendingEmail}>
+                {isSendingEmail ? 'Opening email...' : '📧 Send My Story'}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Email sent confirmation */}
+        {emailSent && (
+          <div className="card p-4 text-center bg-success/20 border-success">
+            <p className="text-success font-semibold">Story ready to send!</p>
+            <p className="text-sm text-falcons-silver mt-1">
+              Your email app should be open. Just tap Send!
+            </p>
           </div>
         )}
 
@@ -269,34 +190,46 @@ export default function StoryPage() {
       </div>
 
       {/* Input */}
-      {!isComplete && (
-        <div className="border-t border-falcons-silver/10 p-4 bg-bg-dark/95 backdrop-blur-sm">
-          <form onSubmit={handleSubmit} className="flex gap-3">
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Type your answer..."
-              rows={2}
-              className="input-field flex-1 resize-none"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSubmit(e);
-                }
-              }}
-            />
-            <button
-              type="submit"
-              disabled={!input.trim()}
-              className="w-14 h-14 bg-falcons-red rounded-card flex items-center justify-center disabled:opacity-50 transition-opacity self-end"
-            >
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-              </svg>
-            </button>
-          </form>
-        </div>
-      )}
+      <div className="border-t border-falcons-silver/10 p-4 bg-bg-dark/95 backdrop-blur-sm">
+        {!isOnline && (
+          <div className="mb-3 p-3 bg-warning/20 rounded-card text-warning text-sm text-center">
+            You&apos;re offline. Story sharing needs internet.
+          </div>
+        )}
+
+        <form onSubmit={onSubmit} className="flex gap-3">
+          <textarea
+            value={input}
+            onChange={handleInputChange}
+            placeholder="Share your thoughts..."
+            disabled={!isOnline || isLoading}
+            rows={2}
+            className="input-field flex-1 resize-none"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                onSubmit(e as unknown as React.FormEvent<HTMLFormElement>);
+              }
+            }}
+          />
+          <button
+            type="submit"
+            disabled={!input.trim() || isLoading || !isOnline}
+            className="w-14 h-14 bg-falcons-red rounded-card flex items-center justify-center disabled:opacity-50 transition-opacity self-end"
+          >
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>
+          </button>
+        </form>
+
+        {/* Show send button hint after some messages */}
+        {messages.length >= 6 && messages.length < 12 && !showSendButton && (
+          <p className="text-xs text-falcons-silver/50 text-center mt-2">
+            Keep sharing - the &quot;Send&quot; button will appear when ready
+          </p>
+        )}
+      </div>
     </div>
   );
 }
