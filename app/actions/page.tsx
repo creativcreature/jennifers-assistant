@@ -14,17 +14,18 @@ const ActionList = dynamic(() => import('@/components/actions/ActionList'), {
 
 export default function ActionsPage() {
   return (
-    <div className="pb-4">
+    <div className="flex flex-col">
       {/* Hero Section */}
-      <div className="relative h-40 overflow-hidden">
+      <div className="relative h-52 w-full overflow-hidden">
         <Image
           src="/images/falcons/bijan-robinson.jpeg"
           alt="Bijan Robinson running"
           fill
           className="object-cover object-top"
           priority
+          sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[var(--bg-primary)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-[var(--bg-primary)]" />
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <h1 className="font-display text-2xl font-bold text-white drop-shadow-lg">
             Your Game Plan

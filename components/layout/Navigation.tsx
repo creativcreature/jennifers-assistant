@@ -86,7 +86,13 @@ export default function Navigation() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 glass border-t border-[var(--border-color)] safe-bottom z-50">
+    <nav
+      className="fixed bottom-0 left-0 right-0 border-t safe-bottom z-50 transition-colors duration-300"
+      style={{
+        backgroundColor: 'var(--bg-secondary)',
+        borderColor: 'var(--border-color)',
+      }}
+    >
       <div className="max-w-screen-lg mx-auto flex items-center justify-around py-2">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
@@ -94,12 +100,18 @@ export default function Navigation() {
             <Link
               key={item.href}
               href={item.href}
-              className={`nav-item ${isActive ? 'active' : ''}`}
+              className="relative flex flex-col items-center justify-center min-h-[56px] min-w-[64px] px-2 transition-all duration-200"
+              style={{
+                color: isActive ? 'var(--falcons-red)' : 'var(--text-muted)',
+              }}
             >
               {item.icon(isActive)}
-              <span className="font-medium">{item.label}</span>
+              <span className="text-xs font-medium mt-1">{item.label}</span>
               {isActive && (
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-falcons-red rounded-full" />
+                <span
+                  className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
+                  style={{ backgroundColor: 'var(--falcons-red)' }}
+                />
               )}
             </Link>
           );

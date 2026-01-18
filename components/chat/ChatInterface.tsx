@@ -64,9 +64,9 @@ Would you like help preparing what to say when you call?`,
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col flex-1">
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 scrollbar-hide">
+      <div className="flex-1 px-4 py-4 space-y-4">
         {messages.map((message, index) => (
           <div
             key={message.id}
@@ -111,8 +111,8 @@ Would you like help preparing what to say when you call?`,
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Area */}
-      <div className="border-t border-[var(--border-color)] p-4 glass">
+      {/* Input Area - Fixed at bottom */}
+      <div className="sticky bottom-20 border-t border-[var(--border-color)] p-4 glass">
         {!isOnline && (
           <div className="mb-3 p-4 rounded-card bg-warning/10 border border-warning/30 text-center">
             <span className="text-warning font-medium">You&apos;re offline</span>

@@ -24,7 +24,6 @@ export default function StoryPage() {
       },
     ],
     onFinish: (message) => {
-      // Show send button after enough conversation or when AI signals wrap-up
       if (messages.length >= 10 ||
           message.content.toLowerCase().includes('send my story') ||
           message.content.toLowerCase().includes('ready to send')) {
@@ -33,12 +32,10 @@ export default function StoryPage() {
     },
   });
 
-  // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Show send button after meaningful conversation
   useEffect(() => {
     if (messages.length >= 12) {
       setShowSendButton(true);
@@ -96,13 +93,10 @@ export default function StoryPage() {
     setIsSendingEmail(true);
     try {
       const storyText = compileStoryFromMessages();
-
       const recipient = 'c.parker3@me.com';
       const subject = encodeURIComponent("Jennifer's Story - Please Read");
       const body = encodeURIComponent(storyText);
-
       window.location.href = `mailto:${recipient}?subject=${subject}&body=${body}`;
-
       setEmailSent(true);
     } catch (error) {
       console.error('Error sending email:', error);
@@ -117,17 +111,18 @@ export default function StoryPage() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-140px)]">
+    <div className="flex flex-col">
       {/* Hero Section with Player Image */}
-      <div className="relative h-48 overflow-hidden">
+      <div className="relative h-52 w-full overflow-hidden">
         <Image
           src="/images/falcons/matt-ryan-julio-jones.jpg"
           alt="Matt Ryan and Julio Jones celebrating"
           fill
           className="object-cover object-top"
           priority
+          sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[var(--bg-primary)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-[var(--bg-primary)]" />
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <h1 className="font-display text-2xl font-bold text-white drop-shadow-lg">
             Share Your Story
@@ -141,7 +136,7 @@ export default function StoryPage() {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 scrollbar-hide">
+      <div className="px-4 py-4 space-y-4">
         {messages.map((message, index) => (
           <div
             key={message.id}
@@ -167,6 +162,26 @@ export default function StoryPage() {
                 <div className="w-2.5 h-2.5 bg-falcons-red rounded-full animate-bounce" />
                 <div className="w-2.5 h-2.5 bg-falcons-red rounded-full animate-bounce" style={{ animationDelay: '0.15s' }} />
                 <div className="w-2.5 h-2.5 bg-falcons-red rounded-full animate-bounce" style={{ animationDelay: '0.3s' }} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Falcons Fan Card */}
+        {messages.length >= 4 && messages.length < 10 && !showSendButton && (
+          <div className="card-elevated overflow-hidden animate-slide-up">
+            <div className="relative h-32">
+              <Image
+                src="/images/falcons/drake-london.webp"
+                alt="Drake London"
+                fill
+                className="object-cover"
+                sizes="100vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+              <div className="absolute bottom-3 left-4 right-4">
+                <p className="text-white font-display text-lg">Rise Up!</p>
+                <p className="text-white/80 text-xs">Keep sharing your Falcons memories</p>
               </div>
             </div>
           </div>
@@ -202,11 +217,11 @@ export default function StoryPage() {
           </div>
         )}
 
-        <div ref={messagesEndRef} />
+        <div ref={messagesEndRef} className="h-4" />
       </div>
 
-      {/* Input */}
-      <div className="border-t border-[var(--border-color)] p-4 glass">
+      {/* Input - Sticky at bottom */}
+      <div className="sticky bottom-20 border-t border-[var(--border-color)] p-4 glass">
         {!isOnline && (
           <div className="mb-3 p-4 rounded-card bg-warning/10 border border-warning/30 text-center">
             <span className="text-warning font-medium">You&apos;re offline</span>
@@ -243,7 +258,6 @@ export default function StoryPage() {
           </button>
         </form>
 
-        {/* Show send button hint after some messages */}
         {messages.length >= 6 && messages.length < 12 && !showSendButton && (
           <p className="text-xs text-muted text-center mt-3">
             Keep sharing - the &quot;Send&quot; button will appear when ready

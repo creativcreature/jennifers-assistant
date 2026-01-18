@@ -12,14 +12,12 @@ export default function ResourcesPage() {
   const [filter, setFilter] = useState<ResourceType>('food');
   const { location, loading: locationLoading, error: locationError, requestLocation } = useGeolocation();
 
-  // Filter and sort resources by distance
   const filteredResources = useMemo(() => {
     let resources = RESOURCES.filter((r) => {
       if (filter === 'all') return true;
       return r.type === filter;
     });
 
-    // Sort by distance if we have location
     if (location) {
       resources = sortResourcesByDistance(resources, location.latitude, location.longitude);
     }
@@ -35,17 +33,18 @@ export default function ResourcesPage() {
   ];
 
   return (
-    <div className="pb-4">
+    <div className="flex flex-col">
       {/* Hero Section */}
-      <div className="relative h-40 overflow-hidden">
+      <div className="relative h-52 w-full overflow-hidden">
         <Image
           src="/images/falcons/team-action.jpg"
           alt="Atlanta Falcons team"
           fill
           className="object-cover"
           priority
+          sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[var(--bg-primary)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-[var(--bg-primary)]" />
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <h1 className="font-display text-2xl font-bold text-white drop-shadow-lg">
             Atlanta Resources
@@ -131,8 +130,27 @@ export default function ResourcesPage() {
         </a>
       </div>
 
+      {/* Motivational Card with Player Image */}
+      <div className="px-4 mb-4">
+        <div className="card-elevated overflow-hidden">
+          <div className="relative h-24">
+            <Image
+              src="/images/falcons/michael-vick.jpg"
+              alt="Michael Vick"
+              fill
+              className="object-cover object-top"
+              sizes="100vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent" />
+            <div className="absolute inset-0 flex items-center p-4">
+              <p className="text-white font-display text-lg">Keep pushing forward!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Resources List */}
-      <div className="space-y-3 px-4 pb-4">
+      <div className="space-y-3 px-4 pb-8">
         {filteredResources.length === 0 ? (
           <div className="card-elevated p-8 text-center animate-fade-in">
             <p className="text-secondary">

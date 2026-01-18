@@ -50,14 +50,16 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="flex flex-col min-h-screen bg-primary transition-colors duration-300">
+      <body className="bg-primary transition-colors duration-300">
         <ThemeProvider>
-          <OfflineIndicator />
-          <Header />
-          <main className="flex-1 overflow-auto pb-24 max-w-screen-lg mx-auto w-full">
-            {children}
-          </main>
-          <Navigation />
+          <div className="min-h-screen flex flex-col">
+            <OfflineIndicator />
+            <Header />
+            <main className="flex-1 max-w-screen-lg mx-auto w-full pb-24">
+              {children}
+            </main>
+            <Navigation />
+          </div>
         </ThemeProvider>
       </body>
     </html>

@@ -30,17 +30,18 @@ export default function InfoPage() {
   ];
 
   return (
-    <div className="pb-4">
+    <div className="flex flex-col">
       {/* Hero Section */}
-      <div className="relative h-40 overflow-hidden">
+      <div className="relative h-52 w-full overflow-hidden">
         <Image
           src="/images/falcons/michael-vick.jpg"
           alt="Michael Vick"
           fill
           className="object-cover object-top"
           priority
+          sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[var(--bg-primary)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-[var(--bg-primary)]" />
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <h1 className="font-display text-2xl font-bold text-white drop-shadow-lg">
             My Info
@@ -74,8 +75,27 @@ export default function InfoPage() {
         ))}
       </div>
 
+      {/* Falcons Fan Card */}
+      <div className="px-4 mb-4">
+        <div className="card-elevated overflow-hidden">
+          <div className="relative h-20">
+            <Image
+              src="/images/falcons/drake-london.webp"
+              alt="Drake London"
+              fill
+              className="object-cover"
+              sizes="100vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent" />
+            <div className="absolute inset-0 flex items-center p-4">
+              <p className="text-white font-display">Stay organized, stay strong!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Tab Content */}
-      <div className="px-4 pb-4 animate-fade-in" key={activeTab}>
+      <div className="px-4 pb-8 animate-fade-in" key={activeTab}>
         {activeTab === 'meds' && <MedicationTracker />}
         {activeTab === 'appointments' && <AppointmentList />}
         {activeTab === 'contacts' && <ContactList />}

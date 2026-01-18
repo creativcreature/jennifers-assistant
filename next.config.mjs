@@ -8,6 +8,9 @@ const withSerwist = withSerwistInit({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  images: {
+    unoptimized: true, // Allow all images without optimization restrictions
+  },
 };
 
 export default withSerwist(nextConfig);
