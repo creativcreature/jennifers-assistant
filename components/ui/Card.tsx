@@ -35,9 +35,9 @@ export function CardHeader({ title, subtitle, badge, icon }: CardHeaderProps) {
           </div>
         )}
         <div>
-          <h3 className="font-display text-lg font-semibold text-white">{title}</h3>
+          <h3 className="font-display text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>{title}</h3>
           {subtitle && (
-            <p className="text-sm text-falcons-silver mt-0.5">{subtitle}</p>
+            <p className="text-sm mt-0.5" style={{ color: 'var(--text-secondary)' }}>{subtitle}</p>
           )}
         </div>
       </div>
@@ -53,7 +53,7 @@ interface CardContentProps {
 }
 
 export function CardContent({ children, className }: CardContentProps) {
-  return <div className={cn('text-base text-falcons-silver', className)}>{children}</div>;
+  return <div className={cn('text-base', className)} style={{ color: 'var(--text-secondary)' }}>{children}</div>;
 }
 
 // Card Footer
@@ -64,7 +64,7 @@ interface CardFooterProps {
 
 export function CardFooter({ children, className }: CardFooterProps) {
   return (
-    <div className={cn('mt-4 pt-4 border-t border-falcons-silver/10 flex flex-col gap-3', className)}>
+    <div className={cn('mt-4 pt-4 border-t flex flex-col gap-3', className)} style={{ borderColor: 'var(--border-color)' }}>
       {children}
     </div>
   );

@@ -17,11 +17,11 @@ export default function OfflinePage() {
         </svg>
       </div>
 
-      <h1 className="font-display text-2xl font-bold text-white mb-3">
+      <h1 className="font-display text-2xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>
         You&apos;re Offline
       </h1>
 
-      <p className="text-lg text-falcons-silver mb-8 max-w-sm">
+      <p className="text-lg mb-8 max-w-sm" style={{ color: 'var(--text-secondary)' }}>
         Some features need internet connection. But you can still:
       </p>
 
@@ -29,8 +29,8 @@ export default function OfflinePage() {
         <div className="card p-4 flex items-center gap-4">
           <span className="text-2xl">✓</span>
           <div>
-            <p className="font-semibold text-white">View your saved info</p>
-            <p className="text-sm text-falcons-silver">
+            <p className="font-semibold" style={{ color: 'var(--text-primary)' }}>View your saved info</p>
+            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
               Medications, appointments, contacts
             </p>
           </div>
@@ -39,8 +39,8 @@ export default function OfflinePage() {
         <div className="card p-4 flex items-center gap-4">
           <span className="text-2xl">✓</span>
           <div>
-            <p className="font-semibold text-white">Make phone calls</p>
-            <p className="text-sm text-falcons-silver">
+            <p className="font-semibold" style={{ color: 'var(--text-primary)' }}>Make phone calls</p>
+            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
               Tap any phone number to call
             </p>
           </div>
@@ -49,8 +49,8 @@ export default function OfflinePage() {
         <div className="card p-4 flex items-center gap-4">
           <span className="text-2xl">✓</span>
           <div>
-            <p className="font-semibold text-white">See your actions</p>
-            <p className="text-sm text-falcons-silver">
+            <p className="font-semibold" style={{ color: 'var(--text-primary)' }}>See your actions</p>
+            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
               Check your to-do list and scripts
             </p>
           </div>

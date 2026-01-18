@@ -50,7 +50,7 @@ export default function ContactList() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="font-display text-lg font-semibold text-white">My Contacts</h2>
+        <h2 className="font-display text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>My Contacts</h2>
         <button
           onClick={() => setShowForm(!showForm)}
           className="text-falcons-red font-semibold text-sm"
@@ -116,13 +116,13 @@ export default function ContactList() {
             <CardContent>
               {contact.organization && (
                 <p className="text-sm">
-                  <span className="font-semibold text-white">Organization:</span>{' '}
+                  <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>Organization:</span>{' '}
                   {contact.organization}
                 </p>
               )}
               {contact.notes && (
                 <p className="text-sm mt-1">
-                  <span className="font-semibold text-white">Notes:</span> {contact.notes}
+                  <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>Notes:</span> {contact.notes}
                 </p>
               )}
             </CardContent>
@@ -130,7 +130,8 @@ export default function ContactList() {
               <CallButton phone={contact.phone} />
               <button
                 onClick={() => contact.id && deleteContact(contact.id)}
-                className="text-falcons-silver text-sm underline"
+                className="text-sm underline"
+                style={{ color: 'var(--text-muted)' }}
               >
                 Remove
               </button>

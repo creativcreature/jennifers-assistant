@@ -44,7 +44,7 @@ export default function CaseNumbers() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="font-display text-lg font-semibold text-white">My Case Numbers</h2>
+        <h2 className="font-display text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>My Case Numbers</h2>
         <button
           onClick={() => setShowForm(!showForm)}
           className="text-falcons-red font-semibold text-sm"
@@ -57,7 +57,7 @@ export default function CaseNumbers() {
         <Card>
           <CardContent className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-falcons-silver mb-2">
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
                 Type of Case
               </label>
               <div className="flex flex-wrap gap-2 mb-2">
@@ -65,11 +65,11 @@ export default function CaseNumbers() {
                   <button
                     key={type}
                     onClick={() => setNewCase({ ...newCase, type })}
-                    className={`px-3 py-2 rounded-card text-sm ${
-                      newCase.type === type
-                        ? 'bg-falcons-red text-white'
-                        : 'bg-bg-card text-falcons-silver'
-                    }`}
+                    className="px-3 py-2 rounded-card text-sm"
+                    style={{
+                      backgroundColor: newCase.type === type ? 'var(--falcons-red)' : 'var(--bg-surface)',
+                      color: newCase.type === type ? 'white' : 'var(--text-secondary)',
+                    }}
                   >
                     {type}
                   </button>
@@ -116,7 +116,7 @@ export default function CaseNumbers() {
             {caseNum.notes && (
               <CardContent>
                 <p className="text-sm">
-                  <span className="font-semibold text-white">Notes:</span> {caseNum.notes}
+                  <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>Notes:</span> {caseNum.notes}
                 </p>
               </CardContent>
             )}
@@ -132,7 +132,8 @@ export default function CaseNumbers() {
               </button>
               <button
                 onClick={() => caseNum.id && deleteCaseNumber(caseNum.id)}
-                className="text-falcons-silver text-sm underline"
+                className="text-sm underline"
+                style={{ color: 'var(--text-muted)' }}
               >
                 Remove
               </button>

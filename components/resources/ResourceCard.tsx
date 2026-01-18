@@ -83,13 +83,13 @@ export default function ResourceCard({ resource, userLocation }: ResourceCardPro
 
         {resource.hours && (
           <p className="text-sm">
-            <span className="font-semibold text-white">Hours:</span> {resource.hours}
+            <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>Hours:</span> {resource.hours}
           </p>
         )}
 
         {resource.address && (
           <p className="text-sm">
-            <span className="font-semibold text-white">Address:</span> {resource.address}
+            <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>Address:</span> {resource.address}
           </p>
         )}
 

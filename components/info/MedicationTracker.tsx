@@ -43,7 +43,7 @@ export default function MedicationTracker() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="font-display text-lg font-semibold text-white">My Medications</h2>
+        <h2 className="font-display text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>My Medications</h2>
         <button
           onClick={() => setShowForm(!showForm)}
           className="text-falcons-red font-semibold text-sm"
@@ -101,16 +101,17 @@ export default function MedicationTracker() {
             />
             <CardContent>
               <p className="text-sm">
-                <span className="font-semibold text-white">When:</span> {med.frequency}
+                <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>When:</span> {med.frequency}
               </p>
               {med.notes && (
                 <p className="text-sm mt-1">
-                  <span className="font-semibold text-white">Notes:</span> {med.notes}
+                  <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>Notes:</span> {med.notes}
                 </p>
               )}
               <button
                 onClick={() => med.id && deleteMedication(med.id)}
-                className="text-falcons-silver text-sm mt-3 underline"
+                className="text-sm mt-3 underline"
+                style={{ color: 'var(--text-muted)' }}
               >
                 Remove
               </button>

@@ -49,9 +49,10 @@ export default function MessageBubble({ role, content }: MessageBubbleProps) {
       </div>
       <div
         className={cn(
-          'text-xs text-falcons-silver/60 mt-1',
+          'text-xs mt-1',
           isAssistant ? 'text-left' : 'text-right'
         )}
+        style={{ color: 'var(--text-muted)' }}
       >
         {isAssistant ? 'Jennifer\'s Assistant' : 'You'}
       </div>

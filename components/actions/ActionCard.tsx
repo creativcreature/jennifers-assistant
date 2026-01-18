@@ -48,7 +48,7 @@ export default function ActionCard({ action, onStatusChange, isExpanded = false 
             {/* What to bring */}
             {action.bringList && action.bringList.length > 0 && (
               <div>
-                <h4 className="font-semibold text-white mb-2">What to bring:</h4>
+                <h4 className="font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>What to bring:</h4>
                 <ul className="list-disc list-inside space-y-1 text-sm">
                   {action.bringList.map((item, i) => (
                     <li key={i}>{item}</li>
@@ -81,8 +81,8 @@ export default function ActionCard({ action, onStatusChange, isExpanded = false 
                 </button>
 
                 {showScript && (
-                  <div className="mt-3 p-4 bg-bg-dark rounded-lg border border-falcons-silver/10">
-                    <pre className="whitespace-pre-wrap text-sm font-body leading-relaxed">
+                  <div className="mt-3 p-4 rounded-lg border" style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-color)' }}>
+                    <pre className="whitespace-pre-wrap text-sm font-body leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                       {action.script}
                     </pre>
                   </div>
@@ -97,7 +97,8 @@ export default function ActionCard({ action, onStatusChange, isExpanded = false 
         {/* Expand/Collapse */}
         <button
           onClick={() => setExpanded(!expanded)}
-          className="text-falcons-silver text-sm underline"
+          className="text-sm underline"
+          style={{ color: 'var(--text-muted)' }}
         >
           {expanded ? 'Show less' : 'Show more details'}
         </button>

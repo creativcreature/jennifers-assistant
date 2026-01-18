@@ -53,7 +53,7 @@ export default function AppointmentList() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="font-display text-lg font-semibold text-white">My Appointments</h2>
+        <h2 className="font-display text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>My Appointments</h2>
         <button
           onClick={() => setShowForm(!showForm)}
           className="text-falcons-red font-semibold text-sm"
@@ -124,12 +124,12 @@ export default function AppointmentList() {
             <CardContent>
               {appt.location && (
                 <p className="text-sm">
-                  <span className="font-semibold text-white">Where:</span> {appt.location}
+                  <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>Where:</span> {appt.location}
                 </p>
               )}
               {appt.notes && (
                 <p className="text-sm mt-1">
-                  <span className="font-semibold text-white">Notes:</span> {appt.notes}
+                  <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>Notes:</span> {appt.notes}
                 </p>
               )}
             </CardContent>
@@ -139,7 +139,8 @@ export default function AppointmentList() {
                 {appt.location && <DirectionsButton address={appt.location} />}
                 <button
                   onClick={() => appt.id && deleteAppointment(appt.id)}
-                  className="text-falcons-silver text-sm underline"
+                  className="text-sm underline"
+                  style={{ color: 'var(--text-muted)' }}
                 >
                   Remove
                 </button>
