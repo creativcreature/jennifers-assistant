@@ -31,10 +31,10 @@ export default function Home() {
       {/* Hero Banner */}
       <div className="relative h-44 w-full overflow-hidden flex-shrink-0">
         <Image
-          src="/images/falcons/julio-catch.webp"
-          alt="Julio Jones making a catch"
+          src="/images/falcons/drake-london.webp"
+          alt="Drake London"
           fill
-          className="object-cover object-center"
+          className="object-cover object-top"
           priority
           sizes="100vw"
         />
