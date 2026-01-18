@@ -1,0 +1,204 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Oswald:wght@400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap');
+
+@layer base {
+  :root {
+    /* Falcons Color System */
+    --falcons-red: #A71930;
+    --falcons-red-dark: #8B1528;
+    --falcons-black: #000000;
+    --falcons-silver: #A5ACAF;
+    --falcons-white: #FFFFFF;
+
+    /* Extended Palette */
+    --red-glow: rgba(167, 25, 48, 0.3);
+    --cream: #F7F3ED;
+    --gold: #C19A6B;
+    --gold-accessible: #8B6914;
+
+    /* Status Colors */
+    --success: #2d6a4f;
+    --warning: #e07b39;
+    --info: #3d5a80;
+
+    /* Backgrounds */
+    --bg-dark: #0a0a0a;
+    --bg-card: rgba(255, 255, 255, 0.05);
+  }
+
+  html {
+    font-family: 'DM Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-bg-dark text-white min-h-screen;
+    font-size: 22px;
+    line-height: 1.6;
+  }
+
+  /* Accessibility - Larger touch targets */
+  button, a, input, select, textarea {
+    min-height: 48px;
+  }
+
+  /* High contrast focus states */
+  :focus-visible {
+    outline: 3px solid var(--falcons-red);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* Large accessible button */
+  .btn-primary {
+    @apply bg-falcons-red text-white font-display font-semibold;
+    @apply px-6 py-4 rounded-card;
+    @apply min-h-touch w-full;
+    @apply flex items-center justify-center;
+    @apply transition-all duration-200;
+    @apply hover:bg-falcons-red-dark active:scale-[0.98];
+    @apply focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-falcons-black;
+    font-size: 20px;
+  }
+
+  .btn-secondary {
+    @apply bg-transparent text-white font-display font-semibold;
+    @apply px-6 py-4 rounded-card;
+    @apply min-h-touch w-full;
+    @apply flex items-center justify-center;
+    @apply border-2 border-falcons-silver/30;
+    @apply transition-all duration-200;
+    @apply hover:border-falcons-red hover:text-falcons-red active:scale-[0.98];
+    font-size: 20px;
+  }
+
+  .btn-call {
+    @apply bg-success text-white font-display font-semibold;
+    @apply px-6 py-4 rounded-card;
+    @apply min-h-touch;
+    @apply flex items-center justify-center gap-3;
+    @apply transition-all duration-200;
+    @apply hover:opacity-90 active:scale-[0.98];
+    font-size: 20px;
+  }
+
+  /* Card component */
+  .card {
+    @apply bg-bg-card backdrop-blur-sm;
+    @apply rounded-card p-5;
+    @apply border border-falcons-silver/10;
+  }
+
+  .card-elevated {
+    @apply card;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Message bubbles */
+  .message-ai {
+    @apply bg-falcons-red/10 border border-falcons-red/20;
+    @apply rounded-card rounded-tl-sm;
+    @apply p-5;
+  }
+
+  .message-user {
+    @apply bg-falcons-silver/10 border border-falcons-silver/20;
+    @apply rounded-card rounded-tr-sm;
+    @apply p-5;
+  }
+
+  /* Input fields */
+  .input-field {
+    @apply bg-bg-card border border-falcons-silver/20;
+    @apply rounded-card px-5 py-4;
+    @apply text-base text-white placeholder:text-falcons-silver/50;
+    @apply min-h-touch w-full;
+    @apply focus:border-falcons-red focus:ring-1 focus:ring-falcons-red;
+    @apply transition-all duration-200;
+  }
+
+  /* Navigation */
+  .nav-item {
+    @apply flex flex-col items-center justify-center;
+    @apply text-falcons-silver transition-colors duration-200;
+    @apply min-h-touch min-w-[64px];
+    font-size: 14px;
+  }
+
+  .nav-item.active {
+    @apply text-falcons-red;
+  }
+
+  .nav-item:hover {
+    @apply text-white;
+  }
+
+  /* Status badges */
+  .badge-success {
+    @apply bg-success/20 text-success px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  .badge-warning {
+    @apply bg-warning/20 text-warning px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  .badge-info {
+    @apply bg-info/20 text-info px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  .badge-pending {
+    @apply bg-falcons-silver/20 text-falcons-silver px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  /* Offline indicator */
+  .offline-banner {
+    @apply bg-warning/90 text-white;
+    @apply px-4 py-3 text-center;
+    @apply font-medium text-sm;
+  }
+
+  /* Quick action buttons */
+  .quick-action {
+    @apply bg-bg-card border border-falcons-silver/20;
+    @apply rounded-card px-5 py-4;
+    @apply text-base text-white;
+    @apply min-h-touch w-full text-left;
+    @apply transition-all duration-200;
+    @apply hover:border-falcons-red hover:bg-falcons-red/5;
+    @apply active:scale-[0.98];
+  }
+
+  /* Progress bar */
+  .progress-bar {
+    @apply h-2 bg-falcons-silver/20 rounded-full overflow-hidden;
+  }
+
+  .progress-fill {
+    @apply h-full bg-falcons-red transition-all duration-500;
+  }
+}
+
+@layer utilities {
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Safe area padding for mobile */
+  .safe-bottom {
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+
+  .safe-top {
+    padding-top: max(16px, env(safe-area-inset-top));
+  }
+}

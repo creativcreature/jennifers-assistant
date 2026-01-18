@@ -1,0 +1,163 @@
+export interface Resource {
+  id: string;
+  name: string;
+  type: 'food' | 'healthcare' | 'shelter' | 'services' | 'transportation';
+  phone?: string;
+  address?: string;
+  hours?: string;
+  description: string;
+  notes?: string;
+  website?: string;
+}
+
+export const RESOURCES: Resource[] = [
+  // Food Resources
+  {
+    id: 'food-hosea',
+    name: 'Hosea Helps',
+    type: 'food',
+    phone: '4047553353',
+    address: '930 Joseph E Boone Blvd NW, Atlanta, GA 30314',
+    hours: 'Tuesday-Thursday, 11am-5pm',
+    description: 'Food pantry and support services',
+    notes: 'Bring ID if you have one',
+  },
+  {
+    id: 'food-central-methodist',
+    name: 'Central United Methodist',
+    type: 'food',
+    phone: '4046591322',
+    address: '503 Peachtree St NE, Atlanta, GA 30308',
+    hours: 'Daily lunch 12pm-1pm',
+    description: 'Free hot lunch every day',
+    notes: 'Downtown location, no ID needed',
+  },
+  {
+    id: 'food-community-bank',
+    name: 'Atlanta Community Food Bank',
+    type: 'food',
+    phone: '4048929822',
+    address: 'Multiple locations',
+    hours: 'Call for locations and hours',
+    description: 'Can help you find food pantries near you',
+    website: 'https://www.acfb.org',
+  },
+  {
+    id: 'food-midtown-mac',
+    name: 'Midtown Assistance Center',
+    type: 'food',
+    phone: '4048750381',
+    address: '30 Porter Place NE, Atlanta, GA 30308',
+    hours: 'Monday-Friday 9am-4pm',
+    description: 'Food pantry and emergency assistance',
+    notes: 'Serves residents of certain zip codes - call to check',
+  },
+  {
+    id: 'food-action-ministries',
+    name: 'Action Ministries',
+    type: 'food',
+    phone: '4048819990',
+    address: 'Multiple locations in Atlanta',
+    hours: 'Varies by location',
+    description: 'Food and clothing assistance',
+  },
+
+  // Healthcare Resources
+  {
+    id: 'health-grady',
+    name: 'Grady Memorial Hospital',
+    type: 'healthcare',
+    phone: '4046161000',
+    address: '80 Jesse Hill Jr Dr SE, Atlanta, GA 30303',
+    hours: 'Emergency: 24/7, Clinics: Varies',
+    description: 'Free/low-cost care with Grady Card',
+    notes: 'Get a Grady Card for free care. ER always open.',
+  },
+  {
+    id: 'health-mercy-care',
+    name: 'Mercy Care Atlanta',
+    type: 'healthcare',
+    phone: '6788438600',
+    address: 'Multiple clinics around Atlanta',
+    hours: 'Monday-Friday, varies by location',
+    description: 'Free primary care, dental, vision for uninsured',
+    notes: 'Has case managers who can help with benefits too',
+  },
+  {
+    id: 'health-good-sam',
+    name: 'Good Samaritan Health Center',
+    type: 'healthcare',
+    phone: '4045230900',
+    address: '1015 Donald Lee Hollowell Pkwy NW, Atlanta, GA 30318',
+    hours: 'Monday-Friday 8am-5pm',
+    description: 'Sliding scale medical and dental care',
+  },
+
+  // Services / Benefits Help
+  {
+    id: 'services-211',
+    name: '211 United Way',
+    type: 'services',
+    phone: '211',
+    description: 'Connects you to all social services: SOAR workers, shelters, food, benefits help',
+    notes: 'Call anytime - they can connect you to a SOAR worker',
+  },
+  {
+    id: 'services-gateway',
+    name: 'Gateway Center',
+    type: 'services',
+    phone: '4042156600',
+    address: '275 Pryor St SW, Atlanta, GA 30303',
+    hours: 'Monday-Friday 8am-5pm',
+    description: 'Homeless services hub: case managers, meals, shelter',
+    notes: 'Has staff who help with SSI applications',
+  },
+  {
+    id: 'services-salvation-army',
+    name: 'Salvation Army',
+    type: 'services',
+    phone: '4048862681',
+    address: '409 Marietta St NW, Atlanta, GA 30313',
+    hours: 'Monday-Friday 9am-5pm',
+    description: 'Emergency assistance, food, shelter resources',
+  },
+  {
+    id: 'services-dfcs',
+    name: 'DFCS Fulton County',
+    type: 'services',
+    phone: '4042061000',
+    address: '2099 MLK Jr Drive, Atlanta, GA 30310',
+    hours: 'Monday-Friday 8am-5pm',
+    description: 'SNAP, Medicaid, and other state benefits',
+  },
+
+  // Transportation
+  {
+    id: 'transport-marta',
+    name: 'MARTA Reduced Fare',
+    type: 'transportation',
+    phone: '4048484800',
+    description: 'Half-price transit for seniors (65+) and people with disabilities',
+    notes: 'You qualify as a senior! Apply at MARTA station with ID.',
+  },
+];
+
+export function getResourcesByType(type: Resource['type']): Resource[] {
+  return RESOURCES.filter(r => r.type === type);
+}
+
+export function getFoodResources(): Resource[] {
+  return getResourcesByType('food');
+}
+
+export function getHealthcareResources(): Resource[] {
+  return getResourcesByType('healthcare');
+}
+
+export function getServicesResources(): Resource[] {
+  return getResourcesByType('services');
+}
+
+export function getResourceById(id: string): Resource | undefined {
+  return RESOURCES.find(r => r.id === id);
+}
