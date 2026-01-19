@@ -765,7 +765,7 @@ export default function NFLPage() {
                   {item.imageUrl && (
                     <button
                       onClick={() => openArticle(item)}
-                      className="relative w-full aspect-[16/9] overflow-hidden"
+                      className="relative w-full aspect-[4/3] overflow-hidden"
                     >
                       <Image
                         src={item.imageUrl}
