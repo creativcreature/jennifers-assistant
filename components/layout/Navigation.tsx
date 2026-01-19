@@ -36,15 +36,14 @@ const navItems = [
     href: '/nfl',
     label: 'NFL',
     icon: (active: boolean) => (
-      <svg className="nav-icon" fill={active ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-        {/* Football icon */}
-        <ellipse cx="12" cy="12" rx="9" ry="5" strokeWidth={2} transform="rotate(45 12 12)" />
-        <path
-          strokeLinecap="round"
-          strokeWidth={2}
-          d="M12 7v10M9 9l6 6M15 9l-6 6"
-          transform="rotate(45 12 12)"
-        />
+      <svg className="nav-icon" fill={active ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+        {/* Football shape */}
+        <ellipse cx="12" cy="12" rx="10" ry="6" transform="rotate(-45 12 12)" />
+        {/* Laces */}
+        <line x1="12" y1="8" x2="12" y2="16" strokeLinecap="round" />
+        <line x1="9" y1="10" x2="15" y2="10" strokeLinecap="round" />
+        <line x1="9" y1="12" x2="15" y2="12" strokeLinecap="round" />
+        <line x1="9" y1="14" x2="15" y2="14" strokeLinecap="round" />
       </svg>
     ),
   },
