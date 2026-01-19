@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 
-type NewsTab = 'league' | 'fantasy' | 'falcons';
+type FeedTab = 'all' | 'fantasy' | 'falcons';
 
-interface NewsItem {
+interface FeedItem {
   id: string;
   title: string;
   description: string;
@@ -13,18 +13,20 @@ interface NewsItem {
   timestamp: string;
   imageUrl?: string;
   url?: string;
+  type: 'news' | 'video';
+  videoId?: string;
 }
 
 export default function NFLPage() {
-  const [activeTab, setActiveTab] = useState<NewsTab>('league');
-  const [news, setNews] = useState<NewsItem[]>([]);
+  const [activeTab, setActiveTab] = useState<FeedTab>('all');
+  const [feed, setFeed] = useState<FeedItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
-  const tabs: { key: NewsTab; label: string; icon: string }[] = [
-    { key: 'league', label: 'League', icon: '🏈' },
-    { key: 'fantasy', label: 'Fantasy', icon: '📊' },
-    { key: 'falcons', label: 'Falcons', icon: '🔴' },
+  const tabs: { key: FeedTab; label: string }[] = [
+    { key: 'all', label: 'League' },
+    { key: 'fantasy', label: 'Fantasy' },
+    { key: 'falcons', label: 'Falcons' },
   ];
 
   // Super Bowl LIX - February 9, 2025
@@ -33,120 +35,107 @@ export default function NFLPage() {
   const daysUntilSuperBowl = Math.ceil((superBowlDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 
   useEffect(() => {
-    fetchNews(activeTab);
+    fetchFeed(activeTab);
 
-    // Auto-refresh every 2 minutes for breaking news
+    // Auto-refresh every 2 minutes
     const interval = setInterval(() => {
-      fetchNews(activeTab);
+      fetchFeed(activeTab, false);
     }, 120000);
 
     return () => clearInterval(interval);
   }, [activeTab]);
 
-  async function fetchNews(tab: NewsTab, showLoading = true) {
+  async function fetchFeed(tab: FeedTab, showLoading = true) {
     if (showLoading) setLoading(true);
     try {
-      const response = await fetch(`/api/nfl-news?category=${tab}`);
+      const category = tab === 'all' ? 'league' : tab;
+      const response = await fetch(`/api/nfl-news?category=${category}`);
       if (response.ok) {
         const data = await response.json();
-        setNews(data.articles || []);
+        setFeed(data.articles || []);
         setLastUpdated(new Date());
       }
     } catch (error) {
-      console.error('Error fetching news:', error);
+      console.error('Error fetching feed:', error);
     }
     setLoading(false);
   }
 
   function handleRefresh() {
-    fetchNews(activeTab);
+    fetchFeed(activeTab);
+  }
+
+  function openArticle(item: FeedItem) {
+    if (item.url) {
+      window.open(item.url, '_blank', 'noopener,noreferrer');
+    }
   }
 
   return (
     <div className="flex flex-col">
-      {/* Hero Section */}
-      <div className="relative h-52 w-full overflow-hidden">
-        <Image
-          src="/images/falcons/team-action.jpg"
-          alt="NFL Football"
-          fill
-          className="object-cover"
-          priority
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/70" />
-        <div className="absolute bottom-0 left-0 right-0 p-4">
-          <h1 className="font-display text-2xl font-bold text-white drop-shadow-lg">
-            NFL News
-          </h1>
-          <p className="text-white/90 text-sm drop-shadow">
-            League updates, fantasy insights, and Falcons news
-          </p>
-        </div>
+      {/* Header */}
+      <div className="px-4 pt-4 pb-2">
+        <h1 className="font-display text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+          NFL News
+        </h1>
+        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+          League updates, fantasy insights, and Falcons news
+        </p>
       </div>
 
       {/* Super Bowl Countdown */}
-      <div className="px-4 py-4">
-        <div
-          className="card-elevated overflow-hidden"
-          style={{
-            background: 'linear-gradient(135deg, var(--falcons-red) 0%, var(--falcons-red-dark) 100%)'
-          }}
-        >
-          <div className="p-4 text-center text-white">
-            <div className="text-sm font-medium opacity-90 mb-1">SUPER BOWL LIX</div>
-            <div className="font-display text-4xl font-bold mb-1">
-              {daysUntilSuperBowl} Days
-            </div>
-            <div className="text-sm opacity-80">
-              February 9, 2025 • New Orleans
+      {daysUntilSuperBowl > 0 && (
+        <div className="px-4 py-3">
+          <div
+            className="rounded-xl overflow-hidden"
+            style={{
+              background: 'linear-gradient(135deg, var(--falcons-red) 0%, var(--falcons-red-dark) 100%)'
+            }}
+          >
+            <div className="p-4 text-center text-white">
+              <div className="text-xs font-medium opacity-90 mb-1">SUPER BOWL LIX</div>
+              <div className="font-display text-3xl font-bold">
+                {daysUntilSuperBowl} Days
+              </div>
+              <div className="text-xs opacity-80">
+                February 9, 2025
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Tab Navigation */}
-      <div className="flex gap-2 px-4 pb-4 overflow-x-auto scrollbar-hide">
+      {/* Tabs */}
+      <div className="flex gap-2 px-4 pb-3 border-b" style={{ borderColor: 'var(--border-color)' }}>
         {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`flex items-center gap-2 px-5 py-3 rounded-card text-sm font-semibold whitespace-nowrap transition-all duration-200 ${
-              activeTab === tab.key
-                ? 'text-white shadow-glow-sm'
-                : ''
+            className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
+              activeTab === tab.key ? 'text-white' : ''
             }`}
             style={{
               background: activeTab === tab.key
-                ? 'linear-gradient(135deg, var(--falcons-red) 0%, var(--falcons-red-dark) 100%)'
+                ? 'var(--falcons-red)'
                 : 'var(--bg-surface)',
               color: activeTab === tab.key ? 'white' : 'var(--text-secondary)',
             }}
           >
-            <span className="text-lg">{tab.icon}</span>
             {tab.label}
           </button>
         ))}
-      </div>
 
-      {/* Refresh Bar */}
-      <div className="px-4 pb-4 flex items-center justify-between">
-        <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
-          {lastUpdated
-            ? `Updated ${lastUpdated.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`
-            : 'Loading...'}
-        </span>
+        {/* Refresh button */}
         <button
           onClick={handleRefresh}
           disabled={loading}
-          className="flex items-center gap-2 px-3 py-2 rounded-card text-sm font-medium transition-all"
-          style={{
-            backgroundColor: 'var(--bg-surface)',
-            color: 'var(--text-secondary)',
-          }}
+          className="ml-auto p-2 rounded-full transition-all"
+          style={{ backgroundColor: 'var(--bg-surface)' }}
+          aria-label="Refresh"
         >
           <svg
-            className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`}
+            className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`}
+            style={{ color: 'var(--text-secondary)' }}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -158,73 +147,90 @@ export default function NFLPage() {
               d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
             />
           </svg>
-          Refresh
         </button>
       </div>
 
-      {/* News Feed */}
-      <div className="px-4 pb-8 space-y-3">
+      {/* Last Updated */}
+      {lastUpdated && (
+        <div className="px-4 py-2">
+          <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
+            Updated {lastUpdated.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+          </span>
+        </div>
+      )}
+
+      {/* Feed */}
+      <div className="divide-y" style={{ borderColor: 'var(--border-color)' }}>
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <div className="w-6 h-6 border-2 border-falcons-red border-t-transparent rounded-full animate-spin" />
           </div>
-        ) : news.length === 0 ? (
-          <div className="card-elevated p-8 text-center">
+        ) : feed.length === 0 ? (
+          <div className="p-8 text-center">
             <p style={{ color: 'var(--text-secondary)' }}>
               No news available right now. Check back soon!
             </p>
           </div>
         ) : (
-          news.map((item, index) => (
-            <a
+          feed.map((item) => (
+            <button
               key={item.id}
-              href={item.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="card-elevated block animate-slide-up hover:scale-[1.01] transition-transform"
-              style={{ animationDelay: `${index * 0.05}s` }}
+              onClick={() => openArticle(item)}
+              className="w-full text-left p-4 hover:bg-surface/50 transition-colors"
+              style={{ borderColor: 'var(--border-color)' }}
             >
-              {item.imageUrl && (
-                <div className="relative h-40 w-full overflow-hidden rounded-t-card -mt-5 -mx-5 mb-3" style={{ width: 'calc(100% + 40px)' }}>
-                  <Image
-                    src={item.imageUrl}
-                    alt={item.title}
-                    fill
-                    className="object-cover"
-                    sizes="100vw"
-                  />
+              <div className="flex gap-3">
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  {/* Source and time */}
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+                      {item.source}
+                    </span>
+                    <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                      · {item.timestamp}
+                    </span>
+                  </div>
+
+                  {/* Title */}
+                  <h3
+                    className="font-medium text-base mb-1 line-clamp-2"
+                    style={{ color: 'var(--text-primary)' }}
+                  >
+                    {item.title}
+                  </h3>
+
+                  {/* Description */}
+                  {item.description && (
+                    <p
+                      className="text-sm line-clamp-2"
+                      style={{ color: 'var(--text-secondary)' }}
+                    >
+                      {item.description}
+                    </p>
+                  )}
                 </div>
-              )}
-              <h3
-                className="font-display text-lg font-semibold mb-2"
-                style={{ color: 'var(--text-primary)' }}
-              >
-                {item.title}
-              </h3>
-              <p
-                className="text-sm mb-3 line-clamp-2"
-                style={{ color: 'var(--text-secondary)' }}
-              >
-                {item.description}
-              </p>
-              <div className="flex items-center justify-between">
-                <span
-                  className="text-xs"
-                  style={{ color: 'var(--text-muted)' }}
-                >
-                  {item.source}
-                </span>
-                <span
-                  className="text-xs"
-                  style={{ color: 'var(--text-muted)' }}
-                >
-                  {item.timestamp}
-                </span>
+
+                {/* Thumbnail */}
+                {item.imageUrl && (
+                  <div className="flex-shrink-0 w-20 h-20 relative rounded-lg overflow-hidden">
+                    <Image
+                      src={item.imageUrl}
+                      alt=""
+                      fill
+                      className="object-cover"
+                      sizes="80px"
+                    />
+                  </div>
+                )}
               </div>
-            </a>
+            </button>
           ))
         )}
       </div>
+
+      {/* Bottom padding for nav */}
+      <div className="h-8" />
     </div>
   );
 }
