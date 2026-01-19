@@ -243,16 +243,8 @@
   }
 
   .nav-icon {
-    @apply w-7 h-7 mb-1;
+    @apply w-6 h-6;
     transition: transform 0.2s ease;
-  }
-
-  .nav-item:hover .nav-icon {
-    transform: scale(1.1);
-  }
-
-  .nav-item.active .nav-icon {
-    transform: scale(1.15);
   }
 
   /* ==================== STATUS BADGES ==================== */

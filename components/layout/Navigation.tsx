@@ -37,11 +37,13 @@ const navItems = [
     label: 'NFL',
     icon: (active: boolean) => (
       <svg className="nav-icon" fill={active ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+        {/* Football icon */}
+        <ellipse cx="12" cy="12" rx="9" ry="5" strokeWidth={2} transform="rotate(45 12 12)" />
         <path
           strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={active ? 0 : 2}
-          d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          strokeWidth={2}
+          d="M12 7v10M9 9l6 6M15 9l-6 6"
+          transform="rotate(45 12 12)"
         />
       </svg>
     ),
@@ -65,17 +67,12 @@ const navItems = [
     label: 'Resources',
     icon: (active: boolean) => (
       <svg className="nav-icon" fill={active ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+        {/* Shopping bag / groceries icon */}
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
-          strokeWidth={active ? 0 : 2}
-          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-        />
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={active ? 0 : 2}
-          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+          strokeWidth={2}
+          d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
         />
       </svg>
     ),
@@ -107,26 +104,21 @@ export default function Navigation() {
         borderColor: 'var(--border-color)',
       }}
     >
-      <div className="max-w-screen-lg mx-auto flex items-center justify-around py-2">
+      <div className="max-w-screen-lg mx-auto flex items-center justify-around py-3 px-2">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link
               key={item.href}
               href={item.href}
-              className="relative flex flex-col items-center justify-center min-h-[56px] min-w-[64px] px-2 transition-all duration-200"
+              className="relative flex items-center justify-center w-12 h-12 rounded-full transition-all duration-200"
               style={{
-                color: isActive ? 'var(--falcons-red)' : 'var(--text-muted)',
+                color: isActive ? 'white' : 'var(--text-muted)',
+                backgroundColor: isActive ? 'var(--falcons-red)' : 'transparent',
               }}
+              title={item.label}
             >
               {item.icon(isActive)}
-              <span className="text-xs font-medium mt-1">{item.label}</span>
-              {isActive && (
-                <span
-                  className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
-                  style={{ backgroundColor: 'var(--falcons-red)' }}
-                />
-              )}
             </Link>
           );
         })}

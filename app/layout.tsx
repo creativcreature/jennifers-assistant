@@ -3,6 +3,7 @@ import "./globals.css";
 import Navigation from "@/components/layout/Navigation";
 import Header from "@/components/layout/Header";
 import OfflineIndicator from "@/components/layout/OfflineIndicator";
+import UpdatePrompt from "@/components/layout/UpdatePrompt";
 import { ThemeProvider } from "@/components/ThemeProvider";
 
 export const metadata: Metadata = {
@@ -54,6 +55,7 @@ export default function RootLayout({
         <ThemeProvider>
           <div className="min-h-screen flex flex-col">
             <OfflineIndicator />
+            <UpdatePrompt />
             <Header />
             <main className="flex-1 max-w-screen-lg mx-auto w-full pb-24">
               {children}
