@@ -13,6 +13,7 @@ export default function StoryPage() {
   const [showSendButton, setShowSendButton] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
 
   const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
     api: '/api/story-chat',
@@ -32,9 +33,12 @@ export default function StoryPage() {
     },
   });
 
+  // Only auto-scroll after user has interacted
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (hasInteracted) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, hasInteracted]);
 
   useEffect(() => {
     if (messages.length >= 12) {
@@ -107,6 +111,7 @@ export default function StoryPage() {
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
+    setHasInteracted(true);
     handleSubmit(e);
   };
 

@@ -3,64 +3,106 @@
 import { useChat } from 'ai/react';
 import { useEffect, useRef, useState } from 'react';
 import MessageBubble from './MessageBubble';
-import QuickActions, { getDefaultSuggestions } from './QuickActions';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
-import { getGreeting } from '@/lib/utils';
+import { getContext, contextToPrompt, saveContext, UserContext } from '@/lib/context';
 
 export default function ChatInterface() {
   const isOnline = useOnlineStatus();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const [showSuggestions, setShowSuggestions] = useState(true);
+  const [hasInteracted, setHasInteracted] = useState(false);
+  const [model, setModel] = useState<'gemini' | 'claude'>('gemini');
+  const [userContext, setUserContext] = useState('');
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading, setInput } = useChat({
+  // Load saved context on mount
+  useEffect(() => {
+    const ctx = getContext();
+    setUserContext(contextToPrompt(ctx));
+  }, []);
+
+  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
     api: '/api/chat',
+    body: { model, userContext },
     initialMessages: [
       {
         id: 'welcome',
         role: 'assistant',
-        content: `${getGreeting()}, Jennifer! 🏈
-
-I'm here to help you with benefits, housing, food, and whatever you need today.
-
-Your most important next step is calling 211 to get connected with a SOAR worker. They're experts who help people get SSI approved faster.
-
-Would you like help preparing what to say when you call?`,
+        content: `Hey Jennifer. What's on your mind today?`,
       },
     ],
-    onFinish: () => {
-      setShowSuggestions(true);
-    },
   });
 
-  // Auto-scroll to bottom
+  // Extract and save context from user messages
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const lastUserMsg = messages.filter(m => m.role === 'user').pop();
+    if (!lastUserMsg) return;
+
+    const text = lastUserMsg.content.toLowerCase();
+    const updates: UserContext = {};
+
+    // Location patterns
+    const locationPatterns = [
+      /(?:i'm at|im at|staying at|i am at|live at|i'm in|im in|i am in)\s+([^,.!?]+)/i,
+      /(?:at the|at a)\s+([^,.!?]+(?:shelter|center|mission|church))/i,
+    ];
+    for (const pattern of locationPatterns) {
+      const match = lastUserMsg.content.match(pattern);
+      if (match) {
+        updates.location = match[1].trim();
+        break;
+      }
+    }
+
+    // City patterns
+    const cityPatterns = [
+      /(?:in|near|around)\s+(atlanta|decatur|marietta|sandy springs|east point|college park)/i,
+    ];
+    for (const pattern of cityPatterns) {
+      const match = lastUserMsg.content.match(pattern);
+      if (match) {
+        updates.city = match[1].trim();
+        break;
+      }
+    }
+
+    // Already contacted patterns
+    if (text.includes('already called') || text.includes('already tried') || text.includes('already contacted')) {
+      const resourceMatch = lastUserMsg.content.match(/(?:called|tried|contacted)\s+([^,.!?]+)/i);
+      if (resourceMatch) {
+        updates.contactedResources = [resourceMatch[1].trim()];
+      }
+    }
+
+    // Preference patterns
+    if (text.includes("don't want to") || text.includes("dont want to") || text.includes("prefer not")) {
+      const prefMatch = lastUserMsg.content.match(/(?:don't want to|dont want to|prefer not to)\s+([^,.!?]+)/i);
+      if (prefMatch) {
+        updates.preferences = [`doesn't want to ${prefMatch[1].trim()}`];
+      }
+    }
+
+    // Save if we found anything
+    if (Object.keys(updates).length > 0) {
+      saveContext(updates);
+      // Refresh context for next request
+      const ctx = getContext();
+      setUserContext(contextToPrompt(ctx));
+    }
   }, [messages]);
 
-  // Handle quick action selection
-  const handleQuickAction = (suggestion: string) => {
-    setInput(suggestion);
-    setShowSuggestions(false);
-    // Submit after a brief delay
-    setTimeout(() => {
-      const form = document.getElementById('chat-form') as HTMLFormElement;
-      if (form) form.requestSubmit();
-    }, 100);
-  };
+  // Auto-scroll to bottom only after user has interacted
+  useEffect(() => {
+    if (hasInteracted) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, hasInteracted]);
 
   // Handle form submission
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
-    setShowSuggestions(false);
+    setHasInteracted(true);
     handleSubmit(e);
-  };
-
-  // Get suggestions based on last message
-  const getSuggestions = (): string[] => {
-    if (!showSuggestions || isLoading) return [];
-    return getDefaultSuggestions();
   };
 
   return (
@@ -99,15 +141,6 @@ Would you like help preparing what to say when you call?`,
           </div>
         )}
 
-        {/* Quick Actions */}
-        {!isLoading && messages.length > 0 && (
-          <QuickActions
-            suggestions={getSuggestions()}
-            onSelect={handleQuickAction}
-            disabled={isLoading}
-          />
-        )}
-
         <div ref={messagesEndRef} />
       </div>
 
@@ -119,6 +152,30 @@ Would you like help preparing what to say when you call?`,
             <span className="text-secondary block text-sm mt-1">Chat will work when you reconnect</span>
           </div>
         )}
+
+        {/* Model Toggle */}
+        <div className="flex justify-end mb-2">
+          <div className="flex rounded-full p-0.5" style={{ backgroundColor: 'var(--bg-surface)' }}>
+            <button
+              type="button"
+              onClick={() => setModel('gemini')}
+              className={`px-3 py-1 text-xs rounded-full transition-all ${
+                model === 'gemini' ? 'bg-falcons-red text-white' : 'text-secondary'
+              }`}
+            >
+              Gemini
+            </button>
+            <button
+              type="button"
+              onClick={() => setModel('claude')}
+              className={`px-3 py-1 text-xs rounded-full transition-all ${
+                model === 'claude' ? 'bg-falcons-red text-white' : 'text-secondary'
+              }`}
+            >
+              Claude
+            </button>
+          </div>
+        </div>
 
         <form id="chat-form" onSubmit={onSubmit} className="flex gap-3">
           <textarea
