@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 // Dynamic import to avoid SSR issues with chat
 const ChatInterface = dynamic(() => import('@/components/chat/ChatInterface'), {
@@ -51,7 +52,9 @@ export default function Home() {
 
       {/* Chat Interface */}
       <div className="flex-1 flex flex-col">
-        <ChatInterface />
+        <ErrorBoundary>
+          <ChatInterface />
+        </ErrorBoundary>
       </div>
     </div>
   );

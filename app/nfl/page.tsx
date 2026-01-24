@@ -11,6 +11,8 @@ import {
   toggleBookmark,
   isBookmarked,
 } from '@/lib/bookmarks';
+import ScoreboardView from '@/components/nfl/ScoreboardView';
+import StandingsTable from '@/components/nfl/StandingsTable';
 
 // Copyright-free fallback images from Unsplash based on content keywords
 const FALLBACK_IMAGES: Record<string, string> = {
@@ -57,7 +59,7 @@ function getContextualFallback(title: string, description?: string): string {
   return FALLBACK_IMAGES.football;
 }
 
-type FeedTab = 'all' | 'fantasy' | 'falcons' | 'videos' | 'saved';
+type FeedTab = 'scores' | 'all' | 'fantasy' | 'falcons' | 'videos' | 'saved';
 
 interface FeedItem {
   id: string;
@@ -80,7 +82,7 @@ interface Video {
 
 export default function NFLPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<FeedTab>('all');
+  const [activeTab, setActiveTab] = useState<FeedTab>('scores');
   const [feed, setFeed] = useState<FeedItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -96,9 +98,10 @@ export default function NFLPage() {
   const [bookmarkState, setBookmarkState] = useState<Record<string, boolean>>({});
 
   const tabs: { key: FeedTab; label: string; icon?: string }[] = [
-    { key: 'all', label: 'League' },
-    { key: 'fantasy', label: 'Fantasy' },
+    { key: 'scores', label: 'Scores' },
+    { key: 'all', label: 'News' },
     { key: 'falcons', label: 'Falcons' },
+    { key: 'fantasy', label: 'Fantasy' },
     { key: 'videos', label: 'Videos' },
     { key: 'saved', label: 'Saved' },
   ];
@@ -192,7 +195,10 @@ export default function NFLPage() {
   }, []);
 
   useEffect(() => {
-    if (activeTab === 'videos') {
+    if (activeTab === 'scores') {
+      // ScoreboardView handles its own fetching
+      setLoading(false);
+    } else if (activeTab === 'videos') {
       fetchVideos(videoFilter);
     } else if (activeTab === 'saved') {
       // Bookmarks are already loaded, just refresh
@@ -292,10 +298,12 @@ export default function NFLPage() {
           NFL News
         </h1>
         <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-          {activeTab === 'fantasy'
+          {activeTab === 'scores'
+            ? 'Live scores, results, and upcoming games'
+            : activeTab === 'fantasy'
             ? 'Fantasy football news, dynasty rankings, and draft prospects'
             : activeTab === 'falcons'
-            ? 'Atlanta Falcons news, updates, and analysis'
+            ? 'Atlanta Falcons news, standings, and analysis'
             : activeTab === 'videos'
             ? 'Highlights, game recaps, and NFL moments'
             : 'League updates, playoff coverage, and breaking news'}
@@ -425,8 +433,12 @@ export default function NFLPage() {
         </div>
       )}
 
-      {/* Videos Tab Content */}
-      {activeTab === 'videos' ? (
+      {/* Scores Tab Content */}
+      {activeTab === 'scores' ? (
+        <div className="px-4 py-4">
+          <ScoreboardView />
+        </div>
+      ) : activeTab === 'videos' ? (
         <div className="px-4 py-4">
           {/* NFL / Falcons Toggle */}
           <div className="flex gap-2 mb-4">
@@ -743,6 +755,12 @@ export default function NFLPage() {
       ) : (
         /* News Feed - Visual Card Layout */
         <div className="px-4 py-4 space-y-4">
+          {/* Standings table for Falcons tab */}
+          {activeTab === 'falcons' && (
+            <div className="mb-4">
+              <StandingsTable />
+            </div>
+          )}
           {loading ? (
             <div className="flex items-center justify-center py-12">
               <div className="w-6 h-6 border-2 border-falcons-red border-t-transparent rounded-full animate-spin" />

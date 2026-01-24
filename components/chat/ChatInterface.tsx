@@ -1,10 +1,17 @@
 'use client';
 
-import { useChat } from 'ai/react';
-import { useEffect, useRef, useState } from 'react';
+import { useChat, Message } from 'ai/react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import MessageBubble from './MessageBubble';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { getContext, contextToPrompt, saveContext, UserContext } from '@/lib/context';
+import { addMessage, getRecentMessages } from '@/lib/db';
+
+const WELCOME_MESSAGE: Message = {
+  id: 'welcome',
+  role: 'assistant',
+  content: `Hey Jennifer. What's on your mind today?`,
+};
 
 export default function ChatInterface() {
   const isOnline = useOnlineStatus();
@@ -13,24 +20,75 @@ export default function ChatInterface() {
   const [hasInteracted, setHasInteracted] = useState(false);
   const [model, setModel] = useState<'gemini' | 'claude'>('gemini');
   const [userContext, setUserContext] = useState('');
+  const [initialMessages, setInitialMessages] = useState<Message[]>([WELCOME_MESSAGE]);
+  const [isReady, setIsReady] = useState(false);
+  const lastSavedRef = useRef<number>(0);
 
-  // Load saved context on mount
+  // Load saved model preference and messages on mount
   useEffect(() => {
+    const savedModel = localStorage.getItem('chat-model');
+    if (savedModel === 'gemini' || savedModel === 'claude') {
+      setModel(savedModel);
+    }
+
     const ctx = getContext();
     setUserContext(contextToPrompt(ctx));
+
+    // Load persisted messages from Dexie
+    getRecentMessages(50).then((saved) => {
+      if (saved.length > 0) {
+        const restored: Message[] = saved.map((m, i) => ({
+          id: `db-${m.id || i}`,
+          role: m.role,
+          content: m.content,
+        }));
+        setInitialMessages([WELCOME_MESSAGE, ...restored]);
+        lastSavedRef.current = saved.length;
+      }
+      setIsReady(true);
+    }).catch(() => {
+      setIsReady(true);
+    });
   }, []);
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
+  const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages } = useChat({
     api: '/api/chat',
     body: { model, userContext },
-    initialMessages: [
-      {
-        id: 'welcome',
-        role: 'assistant',
-        content: `Hey Jennifer. What's on your mind today?`,
-      },
-    ],
+    initialMessages,
   });
+
+  // Persist new messages to Dexie
+  useEffect(() => {
+    if (!isReady) return;
+    // Only persist messages beyond what we already saved
+    const newMessages = messages.filter(m => m.id !== 'welcome' && !m.id.startsWith('db-'));
+    if (newMessages.length > lastSavedRef.current) {
+      const unsaved = newMessages.slice(lastSavedRef.current);
+      unsaved.forEach(m => {
+        if (m.role === 'user' || (m.role === 'assistant' && !isLoading)) {
+          addMessage(m.role, m.content);
+        }
+      });
+      if (!isLoading) {
+        lastSavedRef.current = newMessages.length;
+      }
+    }
+  }, [messages, isLoading, isReady]);
+
+  // Save model preference
+  const handleModelChange = useCallback((newModel: 'gemini' | 'claude') => {
+    setModel(newModel);
+    localStorage.setItem('chat-model', newModel);
+  }, []);
+
+  // Clear chat
+  const handleClearChat = useCallback(async () => {
+    setMessages([WELCOME_MESSAGE]);
+    lastSavedRef.current = 0;
+    // Clear from Dexie
+    const { db } = await import('@/lib/db');
+    await db.messages.clear();
+  }, [setMessages]);
 
   // Extract and save context from user messages
   useEffect(() => {
@@ -40,7 +98,6 @@ export default function ChatInterface() {
     const text = lastUserMsg.content.toLowerCase();
     const updates: UserContext = {};
 
-    // Location patterns
     const locationPatterns = [
       /(?:i'm at|im at|staying at|i am at|live at|i'm in|im in|i am in)\s+([^,.!?]+)/i,
       /(?:at the|at a)\s+([^,.!?]+(?:shelter|center|mission|church))/i,
@@ -53,7 +110,6 @@ export default function ChatInterface() {
       }
     }
 
-    // City patterns
     const cityPatterns = [
       /(?:in|near|around)\s+(atlanta|decatur|marietta|sandy springs|east point|college park)/i,
     ];
@@ -65,7 +121,6 @@ export default function ChatInterface() {
       }
     }
 
-    // Already contacted patterns
     if (text.includes('already called') || text.includes('already tried') || text.includes('already contacted')) {
       const resourceMatch = lastUserMsg.content.match(/(?:called|tried|contacted)\s+([^,.!?]+)/i);
       if (resourceMatch) {
@@ -73,7 +128,6 @@ export default function ChatInterface() {
       }
     }
 
-    // Preference patterns
     if (text.includes("don't want to") || text.includes("dont want to") || text.includes("prefer not")) {
       const prefMatch = lastUserMsg.content.match(/(?:don't want to|dont want to|prefer not to)\s+([^,.!?]+)/i);
       if (prefMatch) {
@@ -81,10 +135,8 @@ export default function ChatInterface() {
       }
     }
 
-    // Save if we found anything
     if (Object.keys(updates).length > 0) {
       saveContext(updates);
-      // Refresh context for next request
       const ctx = getContext();
       setUserContext(contextToPrompt(ctx));
     }
@@ -104,6 +156,14 @@ export default function ChatInterface() {
     setHasInteracted(true);
     handleSubmit(e);
   };
+
+  if (!isReady) {
+    return (
+      <div className="flex flex-col flex-1 items-center justify-center">
+        <div className="w-6 h-6 border-2 border-falcons-red border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col flex-1">
@@ -153,12 +213,19 @@ export default function ChatInterface() {
           </div>
         )}
 
-        {/* Model Toggle */}
-        <div className="flex justify-end mb-2">
+        {/* Model Toggle + Clear Chat */}
+        <div className="flex justify-between items-center mb-2">
+          <button
+            onClick={handleClearChat}
+            className="text-xs px-3 py-1 rounded-full transition-all"
+            style={{ backgroundColor: 'var(--bg-surface)', color: 'var(--text-muted)' }}
+          >
+            Clear Chat
+          </button>
           <div className="flex rounded-full p-0.5" style={{ backgroundColor: 'var(--bg-surface)' }}>
             <button
               type="button"
-              onClick={() => setModel('gemini')}
+              onClick={() => handleModelChange('gemini')}
               className={`px-3 py-1 text-xs rounded-full transition-all ${
                 model === 'gemini' ? 'bg-falcons-red text-white' : 'text-secondary'
               }`}
@@ -167,7 +234,7 @@ export default function ChatInterface() {
             </button>
             <button
               type="button"
-              onClick={() => setModel('claude')}
+              onClick={() => handleModelChange('claude')}
               className={`px-3 py-1 text-xs rounded-full transition-all ${
                 model === 'claude' ? 'bg-falcons-red text-white' : 'text-secondary'
               }`}

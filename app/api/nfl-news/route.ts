@@ -38,32 +38,35 @@ function parseRelativeTime(dateString: string): string {
 
 async function fetchESPNApi(url: string): Promise<NewsArticle[]> {
   try {
-    const response = await fetch(url, { next: { revalidate: 60 } });
-    if (!response.ok) return [];
+    const response = await fetch(url, { cache: 'no-store' });
+    if (!response.ok) {
+      console.error(`ESPN API returned ${response.status} for ${url}`);
+      return [];
+    }
     const data = await response.json();
     const articles: NewsArticle[] = [];
 
-    if (data.articles) {
-      for (let i = 0; i < Math.min(data.articles.length, 25); i++) {
-        const article = data.articles[i];
-        // Use ESPN image if available, otherwise use a fallback from pool
-        const espnImage = article.images?.[0]?.url;
-        const fallbackImage = FALLBACK_IMAGES[i % FALLBACK_IMAGES.length];
+    // Handle alternate ESPN response structures
+    const rawArticles = data.articles || data.news || data.items || [];
 
-        articles.push({
-          id: article.id || String(Math.random()),
-          title: article.headline || 'NFL News',
-          description: article.description || '',
-          source: 'ESPN',
-          timestamp: parseRelativeTime(article.published || new Date().toISOString()),
-          imageUrl: espnImage || fallbackImage,
-          url: article.links?.web?.href || `https://www.espn.com/nfl/story/_/id/${article.id}`,
-        });
-      }
+    for (let i = 0; i < Math.min(rawArticles.length, 25); i++) {
+      const article = rawArticles[i];
+      const espnImage = article.images?.[0]?.url;
+      const fallbackImage = FALLBACK_IMAGES[i % FALLBACK_IMAGES.length];
+
+      articles.push({
+        id: article.id || String(Math.random()),
+        title: article.headline || article.title || 'NFL News',
+        description: article.description || article.summary || '',
+        source: 'ESPN',
+        timestamp: parseRelativeTime(article.published || article.lastModified || new Date().toISOString()),
+        imageUrl: espnImage || fallbackImage,
+        url: article.links?.web?.href || article.link || `https://www.espn.com/nfl/story/_/id/${article.id}`,
+      });
     }
     return articles;
   } catch (error) {
-    console.error('ESPN API error:', error);
+    console.error('ESPN API error for', url, ':', error);
     return [];
   }
 }
