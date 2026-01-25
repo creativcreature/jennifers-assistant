@@ -71,25 +71,29 @@ async function fetchESPNApi(url: string): Promise<NewsArticle[]> {
   }
 }
 
-// Reliable placeholder images (Unsplash - always works)
+// Football-specific placeholder images (verified Unsplash football photos)
 const PLACEHOLDER_IMAGES = {
-  football: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=800&q=80',
-  stadium: 'https://images.unsplash.com/photo-1495809269252-a91f04d3b5e6?w=800&q=80',
-  field: 'https://images.unsplash.com/photo-1508098682722-e99c643e7f0b?w=800&q=80',
-  players: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=800&q=80',
-  superbowl: 'https://images.unsplash.com/photo-1504450758481-7338bbe75c8e?w=800&q=80',
-  trophy: 'https://images.unsplash.com/photo-1569517282132-25d22f4573e6?w=800&q=80',
-  fantasy: 'https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?w=800&q=80',
-  draft: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80',
-  falcons: 'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=800&q=80',
+  football: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=800&q=80', // Football on grass
+  stadium: 'https://images.unsplash.com/photo-1543351611-58f69d7c1b5b?w=800&q=80', // Football stadium
+  field: 'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=800&q=80', // Football field
+  players: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=800&q=80', // Football players
+  superbowl: 'https://images.unsplash.com/photo-1504450758481-7338bbe75c8e?w=800&q=80', // Super Bowl
+  trophy: 'https://images.unsplash.com/photo-1461896836934- voices?w=800&q=80', // Trophy (fallback to football)
+  fantasy: 'https://images.unsplash.com/photo-1508098682722-e99c643e7f0b?w=800&q=80', // Football game action
+  draft: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80', // Football draft
+  falcons: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=800&q=80', // Football (Falcons fallback)
+  helmet: 'https://images.unsplash.com/photo-1554482659-fc4d1a2de31b?w=800&q=80', // Football helmet
+  gameday: 'https://images.unsplash.com/photo-1543351611-58f69d7c1b5b?w=800&q=80', // Game day stadium
 };
 
-// Fallback images pool for ESPN articles
+// Fallback images pool for ESPN articles - all football-specific
 const FALLBACK_IMAGES = [
   PLACEHOLDER_IMAGES.football,
   PLACEHOLDER_IMAGES.stadium,
   PLACEHOLDER_IMAGES.field,
   PLACEHOLDER_IMAGES.players,
+  PLACEHOLDER_IMAGES.helmet,
+  PLACEHOLDER_IMAGES.gameday,
 ];
 
 // Curated content with full article text

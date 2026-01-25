@@ -4,8 +4,11 @@ import { useChat, Message } from 'ai/react';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import MessageBubble from './MessageBubble';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
+import { useGeolocation } from '@/hooks/useGeolocation';
 import { getContext, contextToPrompt, saveContext, UserContext } from '@/lib/context';
 import { addMessage, getRecentMessages } from '@/lib/db';
+
+type ModelType = 'claude' | 'gemini' | 'groq' | 'ollama';
 
 const WELCOME_MESSAGE: Message = {
   id: 'welcome',
@@ -13,22 +16,31 @@ const WELCOME_MESSAGE: Message = {
   content: `Hey Jennifer. What's on your mind today?`,
 };
 
+const isDev = process.env.NODE_ENV === 'development';
+
 export default function ChatInterface() {
   const isOnline = useOnlineStatus();
+  const { location } = useGeolocation();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [hasInteracted, setHasInteracted] = useState(false);
-  const [model, setModel] = useState<'gemini' | 'claude'>('gemini');
+  const [model, setModel] = useState<ModelType>('claude');
   const [userContext, setUserContext] = useState('');
   const [initialMessages, setInitialMessages] = useState<Message[]>([WELCOME_MESSAGE]);
   const [isReady, setIsReady] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const lastSavedRef = useRef<number>(0);
 
   // Load saved model preference and messages on mount
   useEffect(() => {
-    const savedModel = localStorage.getItem('chat-model');
-    if (savedModel === 'gemini' || savedModel === 'claude') {
-      setModel(savedModel);
+    const savedModel = localStorage.getItem('chat-model') as ModelType | null;
+    if (savedModel && ['claude', 'gemini', 'groq', 'ollama'].includes(savedModel)) {
+      // Only allow ollama in dev
+      if (savedModel === 'ollama' && !isDev) {
+        setModel('claude');
+      } else {
+        setModel(savedModel);
+      }
     }
 
     const ctx = getContext();
@@ -53,14 +65,28 @@ export default function ChatInterface() {
 
   const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages } = useChat({
     api: '/api/chat',
-    body: { model, userContext },
+    body: {
+      model,
+      userContext,
+      location: location ? { lat: location.latitude, lng: location.longitude } : null,
+    },
     initialMessages,
+    onError: (error) => {
+      console.error('Chat error:', error);
+      setErrorMsg(error.message || 'Something went wrong. Please try again.');
+    },
   });
+
+  // Clear error when user sends a new message
+  useEffect(() => {
+    if (messages.length > 0 && messages[messages.length - 1].role === 'user') {
+      setErrorMsg(null);
+    }
+  }, [messages]);
 
   // Persist new messages to Dexie
   useEffect(() => {
     if (!isReady) return;
-    // Only persist messages beyond what we already saved
     const newMessages = messages.filter(m => m.id !== 'welcome' && !m.id.startsWith('db-'));
     if (newMessages.length > lastSavedRef.current) {
       const unsaved = newMessages.slice(lastSavedRef.current);
@@ -76,16 +102,17 @@ export default function ChatInterface() {
   }, [messages, isLoading, isReady]);
 
   // Save model preference
-  const handleModelChange = useCallback((newModel: 'gemini' | 'claude') => {
+  const handleModelChange = useCallback((newModel: ModelType) => {
     setModel(newModel);
     localStorage.setItem('chat-model', newModel);
+    setErrorMsg(null);
   }, []);
 
   // Clear chat
   const handleClearChat = useCallback(async () => {
     setMessages([WELCOME_MESSAGE]);
     lastSavedRef.current = 0;
-    // Clear from Dexie
+    setErrorMsg(null);
     const { db } = await import('@/lib/db');
     await db.messages.clear();
   }, [setMessages]);
@@ -182,6 +209,15 @@ export default function ChatInterface() {
           </div>
         ))}
 
+        {/* Error message */}
+        {errorMsg && !isLoading && (
+          <div className="self-start max-w-[90%] animate-fade-in">
+            <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+              {errorMsg}
+            </div>
+          </div>
+        )}
+
         {/* Loading indicator */}
         {isLoading && (
           <div className="self-start max-w-[90%] animate-fade-in">
@@ -222,11 +258,20 @@ export default function ChatInterface() {
           >
             Clear Chat
           </button>
-          <div className="flex rounded-full p-0.5" style={{ backgroundColor: 'var(--bg-surface)' }}>
+          <div className="flex rounded-full p-0.5 overflow-x-auto" style={{ backgroundColor: 'var(--bg-surface)' }}>
+            <button
+              type="button"
+              onClick={() => handleModelChange('claude')}
+              className={`px-3 py-1 text-xs rounded-full transition-all whitespace-nowrap ${
+                model === 'claude' ? 'bg-falcons-red text-white' : 'text-secondary'
+              }`}
+            >
+              Claude
+            </button>
             <button
               type="button"
               onClick={() => handleModelChange('gemini')}
-              className={`px-3 py-1 text-xs rounded-full transition-all ${
+              className={`px-3 py-1 text-xs rounded-full transition-all whitespace-nowrap ${
                 model === 'gemini' ? 'bg-falcons-red text-white' : 'text-secondary'
               }`}
             >
@@ -234,15 +279,33 @@ export default function ChatInterface() {
             </button>
             <button
               type="button"
-              onClick={() => handleModelChange('claude')}
-              className={`px-3 py-1 text-xs rounded-full transition-all ${
-                model === 'claude' ? 'bg-falcons-red text-white' : 'text-secondary'
+              onClick={() => handleModelChange('groq')}
+              className={`px-3 py-1 text-xs rounded-full transition-all whitespace-nowrap ${
+                model === 'groq' ? 'bg-falcons-red text-white' : 'text-secondary'
               }`}
             >
-              Claude
+              Groq
             </button>
+            {isDev && (
+              <button
+                type="button"
+                onClick={() => handleModelChange('ollama')}
+                className={`px-3 py-1 text-xs rounded-full transition-all whitespace-nowrap ${
+                  model === 'ollama' ? 'bg-falcons-red text-white' : 'text-secondary'
+                }`}
+              >
+                Ollama
+              </button>
+            )}
           </div>
         </div>
+
+        {/* Location indicator */}
+        {location && (
+          <div className="text-xs mb-2" style={{ color: 'var(--text-muted)' }}>
+            📍 Location enabled
+          </div>
+        )}
 
         <form id="chat-form" onSubmit={onSubmit} className="flex gap-3">
           <textarea

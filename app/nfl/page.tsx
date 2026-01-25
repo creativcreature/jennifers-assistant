@@ -291,7 +291,7 @@ export default function NFLPage() {
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col overflow-x-hidden">
       {/* Header */}
       <div className="px-4 pt-4 pb-2">
         <h1 className="font-display text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
@@ -380,12 +380,12 @@ export default function NFLPage() {
       )}
 
       {/* Tabs */}
-      <div className="flex gap-2 px-4 pb-3 border-b" style={{ borderColor: 'var(--border-color)' }}>
+      <div className="flex gap-2 px-4 pb-3 border-b overflow-x-auto flex-nowrap scrollbar-hide" style={{ borderColor: 'var(--border-color)' }}>
         {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
+            className={`px-4 py-2 rounded-full text-sm font-semibold transition-all flex-shrink-0 ${
               activeTab === tab.key ? 'text-white' : ''
             }`}
             style={{
