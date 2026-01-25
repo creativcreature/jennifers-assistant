@@ -1,6 +1,5 @@
 import { google } from '@ai-sdk/google';
 import { anthropic } from '@ai-sdk/anthropic';
-import { groq } from '@ai-sdk/groq';
 import { createOpenAI } from '@ai-sdk/openai';
 import { streamText, tool } from 'ai';
 import { z } from 'zod';
@@ -13,7 +12,6 @@ export const maxDuration = 30;
 const AVAILABLE_PROVIDERS = {
   claude: !!process.env.ANTHROPIC_API_KEY,
   gemini: !!process.env.GOOGLE_GENERATIVE_AI_API_KEY,
-  groq: !!process.env.GROQ_API_KEY,
   ollama: process.env.NODE_ENV === 'development', // Only available locally
 };
 
@@ -32,16 +30,12 @@ function getModel(choice: string): any {
   if (choice === 'gemini' && AVAILABLE_PROVIDERS.gemini) {
     return google('gemini-2.0-flash-001');
   }
-  if (choice === 'groq' && AVAILABLE_PROVIDERS.groq) {
-    return groq('llama-3.3-70b-versatile');
-  }
   if (choice === 'ollama' && AVAILABLE_PROVIDERS.ollama) {
     return ollamaProvider('llama3.2');
   }
 
   // Fallback: use the first available provider
   if (AVAILABLE_PROVIDERS.claude) return anthropic('claude-sonnet-4-20250514');
-  if (AVAILABLE_PROVIDERS.groq) return groq('llama-3.3-70b-versatile');
   if (AVAILABLE_PROVIDERS.gemini) return google('gemini-2.0-flash-001');
   if (AVAILABLE_PROVIDERS.ollama) return ollamaProvider('llama3.2');
 
@@ -117,6 +111,6 @@ export async function POST(req: Request) {
 export async function GET() {
   return Response.json({
     providers: AVAILABLE_PROVIDERS,
-    default: AVAILABLE_PROVIDERS.claude ? 'claude' : AVAILABLE_PROVIDERS.groq ? 'groq' : 'gemini',
+    default: AVAILABLE_PROVIDERS.claude ? 'claude' : 'gemini',
   });
 }

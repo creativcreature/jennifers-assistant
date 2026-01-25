@@ -8,7 +8,7 @@ import { useGeolocation } from '@/hooks/useGeolocation';
 import { getContext, contextToPrompt, saveContext, UserContext } from '@/lib/context';
 import { addMessage, getRecentMessages } from '@/lib/db';
 
-type ModelType = 'claude' | 'gemini' | 'groq' | 'ollama';
+type ModelType = 'claude' | 'gemini' | 'ollama';
 
 const WELCOME_MESSAGE: Message = {
   id: 'welcome',
@@ -34,7 +34,7 @@ export default function ChatInterface() {
   // Load saved model preference and messages on mount
   useEffect(() => {
     const savedModel = localStorage.getItem('chat-model') as ModelType | null;
-    if (savedModel && ['claude', 'gemini', 'groq', 'ollama'].includes(savedModel)) {
+    if (savedModel && ['claude', 'gemini', 'ollama'].includes(savedModel)) {
       // Only allow ollama in dev
       if (savedModel === 'ollama' && !isDev) {
         setModel('claude');
@@ -276,15 +276,6 @@ export default function ChatInterface() {
               }`}
             >
               Gemini
-            </button>
-            <button
-              type="button"
-              onClick={() => handleModelChange('groq')}
-              className={`px-3 py-1 text-xs rounded-full transition-all whitespace-nowrap ${
-                model === 'groq' ? 'bg-falcons-red text-white' : 'text-secondary'
-              }`}
-            >
-              Groq
             </button>
             {isDev && (
               <button
