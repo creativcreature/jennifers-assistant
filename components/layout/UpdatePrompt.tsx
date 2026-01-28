@@ -38,9 +38,16 @@ export default function UpdatePrompt() {
     });
 
     // Listen for controller change (happens when new SW takes over)
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
+    navigator.serviceWorker.addEventListener('controllerchange', async () => {
       // Clear the actions version so they refresh
       localStorage.removeItem('jennifer_actions_version');
+      // Clear chat messages to prevent duplicates
+      try {
+        const { db } = await import('@/lib/db');
+        await db.messages.clear();
+      } catch (e) {
+        console.error('Failed to clear messages on update:', e);
+      }
       window.location.reload();
     });
     
