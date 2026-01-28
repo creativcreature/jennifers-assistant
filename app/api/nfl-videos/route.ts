@@ -12,14 +12,20 @@ interface Video {
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 
 // Fallback videos for when API quota is exhausted or returns empty
+// Real NFL/Falcons videos that are embeddable
 const FALLBACK_VIDEOS: Record<string, Video[]> = {
   nfl: [
-    { id: 'dQw4w9WgXcQ', title: 'NFL 2025 Season - Best Plays & Highlights', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg', source: 'NFL Highlights', videoId: 'dQw4w9WgXcQ' },
-    { id: 'jNQXAC9IVRw', title: 'Top 10 NFL Catches of the Season', thumbnail: 'https://img.youtube.com/vi/jNQXAC9IVRw/hqdefault.jpg', source: 'Football Films', videoId: 'jNQXAC9IVRw' },
+    { id: 'EyZuZ0pmZTA', title: 'Top Plays of the 2025 Regular Season', thumbnail: 'https://img.youtube.com/vi/EyZuZ0pmZTA/hqdefault.jpg', source: 'NFL', videoId: 'EyZuZ0pmZTA' },
+    { id: '8RR2j7RGUzI', title: "Raiders' Top 10 Plays from the 2025 NFL Season", thumbnail: 'https://img.youtube.com/vi/8RR2j7RGUzI/hqdefault.jpg', source: 'Las Vegas Raiders', videoId: '8RR2j7RGUzI' },
+    { id: 'QXxCbN48UE8', title: '49ers vs Seahawks Divisional Highlights', thumbnail: 'https://img.youtube.com/vi/QXxCbN48UE8/hqdefault.jpg', source: 'NFL', videoId: 'QXxCbN48UE8' },
   ],
   falcons: [
-    { id: 'dQw4w9WgXcQ', title: 'Atlanta Falcons 2025 Season Highlights', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg', source: 'Falcons Fan TV', videoId: 'dQw4w9WgXcQ' },
-    { id: 'jNQXAC9IVRw', title: 'Bijan Robinson Best Runs - Falcons RB', thumbnail: 'https://img.youtube.com/vi/jNQXAC9IVRw/hqdefault.jpg', source: 'ATL Football', videoId: 'jNQXAC9IVRw' },
+    { id: '_ngIAV9QZXE', title: 'Bijan Robinson - Every Scrimmage Yard from 2025', thumbnail: 'https://img.youtube.com/vi/_ngIAV9QZXE/hqdefault.jpg', source: 'Atlanta Falcons', videoId: '_ngIAV9QZXE' },
+    { id: 'o0TlQZJ561Y', title: 'Bijan Robinson Ultimate Highlights 2025', thumbnail: 'https://img.youtube.com/vi/o0TlQZJ561Y/hqdefault.jpg', source: 'Falcons Highlights', videoId: 'o0TlQZJ561Y' },
+    { id: 'QQ-BsRPpfxA', title: 'Every Atlanta Falcons Sack from 2025 Season', thumbnail: 'https://img.youtube.com/vi/QQ-BsRPpfxA/hqdefault.jpg', source: 'Atlanta Falcons', videoId: 'QQ-BsRPpfxA' },
+    { id: '06l_30fKC38', title: 'Rams vs Falcons Week 17 Highlights', thumbnail: 'https://img.youtube.com/vi/06l_30fKC38/hqdefault.jpg', source: 'NFL', videoId: '06l_30fKC38' },
+    { id: 'T2FC4Q6qqv4', title: 'Bijan Robinson vs Saints Highlights', thumbnail: 'https://img.youtube.com/vi/T2FC4Q6qqv4/hqdefault.jpg', source: 'Atlanta Falcons', videoId: 'T2FC4Q6qqv4' },
+    { id: '8AvXqeI9tyE', title: 'Bijan Robinson 2025 Season Highlights', thumbnail: 'https://img.youtube.com/vi/8AvXqeI9tyE/hqdefault.jpg', source: 'NFL', videoId: '8AvXqeI9tyE' },
   ],
 };
 

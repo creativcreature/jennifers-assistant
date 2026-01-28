@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jennifer's Assistant - Local Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #fafafa; color: #1a1a1a; padding: 48px 24px; max-width: 600px; margin: 0 auto; line-height: 1.6; }
+    h1 { font-family: 'Space Grotesk', sans-serif; font-size: 2rem; font-weight: 700; letter-spacing: -0.04em; margin-bottom: 4px; }
+    .subtitle { color: #6a6a6a; font-size: 0.875rem; margin-bottom: 24px; }
+    .badge { display: inline-block; font-family: 'Space Grotesk', sans-serif; font-size: 0.625rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; padding: 4px 10px; background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; margin-bottom: 24px; }
+    .section { margin-bottom: 28px; }
+    .section-title { font-family: 'Space Grotesk', sans-serif; font-size: 0.625rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: #8a8a8a; margin-bottom: 10px; }
+    .goal { font-size: 0.9375rem; color: #3a3a3a; border-left: 3px solid #e8e8e8; padding-left: 14px; }
+    .stack { display: flex; flex-wrap: wrap; gap: 6px; }
+    .stack span { font-size: 0.75rem; padding: 4px 10px; background: #f0f0f0; color: #4a4a4a; font-weight: 500; }
+    .cmd-block { background: #1a1a1a; color: #e8e8e8; padding: 14px 16px; font-family: 'SF Mono', monospace; font-size: 0.8125rem; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+    .cmd-block:hover { background: #2a2a2a; }
+    .cmd-block::after { content: 'copy'; font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.1em; color: #6a6a6a; }
+    .cmd-block.copied::after { content: 'copied!'; color: #22c55e; }
+    .link { display: inline-block; margin-top: 8px; font-size: 0.8125rem; color: #3b82f6; text-decoration: none; }
+    .link:hover { text-decoration: underline; }
+    .note { font-size: 0.75rem; color: #8a8a8a; margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <h1>Jennifer's Assistant</h1>
+  <div class="subtitle">AI-powered homeless resource finder</div>
+  <div class="badge">Live</div>
+
+  <div class="section">
+    <div class="section-title">Goal</div>
+    <div class="goal">AI-powered life assistant for Jennifer — helps navigate Atlanta resources, housing, healthcare, and daily needs.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Stack</div>
+    <div class="stack">
+      <span>Next.js 15</span>
+      <span>Tailwind</span>
+      <span>Vercel AI SDK</span>
+      <span>Dexie.js</span>
+      <span>PWA</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Run Locally</div>
+    <div class="cmd-block" onclick="copyCmd(this)">cd ~/Documents/App\ Projects/Personal/jennifers-assistant && npm run dev</div>
+    <div class="cmd-block" onclick="copyCmd(this)">open http://localhost:5001</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Live Site</div>
+    <a class="link" href="https://jennifers-assistant.vercel.app" target="_blank">jennifers-assistant.vercel.app</a>
+  </div>
+
+  <div class="note">Requires API keys in <code>.env.local</code> for AI features. Deploy with <code>vercel --prod --yes</code>.</div>
+
+  <script>
+    function copyCmd(el) {
+      navigator.clipboard.writeText(el.textContent.replace('copy','').replace('copied!','').trim());
+      el.classList.add('copied');
+      setTimeout(() => el.classList.remove('copied'), 2000);
+    }
+  </script>
+</body>
+</html>
