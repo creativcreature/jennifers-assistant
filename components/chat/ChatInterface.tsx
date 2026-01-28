@@ -6,7 +6,7 @@ import MessageBubble from './MessageBubble';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { getContext, contextToPrompt, saveContext, UserContext } from '@/lib/context';
-import { addMessage, getRecentMessages } from '@/lib/db';
+import { addMessage, getRecentMessages, archiveAndClearChat } from '@/lib/db';
 
 type ModelType = 'claude' | 'gemini' | 'ollama';
 
@@ -108,13 +108,12 @@ export default function ChatInterface() {
     setErrorMsg(null);
   }, []);
 
-  // Clear chat
+  // Clear chat (archives first)
   const handleClearChat = useCallback(async () => {
     setMessages([WELCOME_MESSAGE]);
     lastSavedRef.current = 0;
     setErrorMsg(null);
-    const { db } = await import('@/lib/db');
-    await db.messages.clear();
+    await archiveAndClearChat();
   }, [setMessages]);
 
   // Extract and save context from user messages

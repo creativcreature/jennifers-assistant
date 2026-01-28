@@ -41,12 +41,12 @@ export default function UpdatePrompt() {
     navigator.serviceWorker.addEventListener('controllerchange', async () => {
       // Clear the actions version so they refresh
       localStorage.removeItem('jennifer_actions_version');
-      // Clear chat messages to prevent duplicates
+      // Archive chat messages before clearing to prevent duplicates
       try {
-        const { db } = await import('@/lib/db');
-        await db.messages.clear();
+        const { archiveAndClearChat } = await import('@/lib/db');
+        await archiveAndClearChat();
       } catch (e) {
-        console.error('Failed to clear messages on update:', e);
+        console.error('Failed to archive messages on update:', e);
       }
       window.location.reload();
     });

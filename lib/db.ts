@@ -9,6 +9,12 @@ export interface Message {
   synced: boolean;
 }
 
+export interface ArchivedChat {
+  id?: number;
+  messages: { role: 'user' | 'assistant'; content: string; timestamp: Date }[];
+  archivedAt: Date;
+}
+
 export interface Action {
   id: string;
   title: string;
@@ -84,6 +90,7 @@ export interface UserProfile {
 // Database class
 class JennifersAssistantDB extends Dexie {
   messages!: EntityTable<Message, 'id'>;
+  archivedChats!: EntityTable<ArchivedChat, 'id'>;
   actions!: EntityTable<Action, 'id'>;
   medications!: EntityTable<Medication, 'id'>;
   appointments!: EntityTable<Appointment, 'id'>;
@@ -95,8 +102,9 @@ class JennifersAssistantDB extends Dexie {
   constructor() {
     super('JennifersAssistantDB');
 
-    this.version(2).stores({
+    this.version(3).stores({
       messages: '++id, role, timestamp, synced',
+      archivedChats: '++id, archivedAt',
       actions: 'id, status, completedAt, priority',
       medications: '++id, name',
       appointments: '++id, date',
@@ -214,4 +222,29 @@ export async function getIntakeResponse(id: string): Promise<IntakeResponse | un
 export async function getIntakeProgress(): Promise<{ answered: number; total: number }> {
   const count = await db.intakeResponses.count();
   return { answered: count, total: 24 }; // 24 questions total
+}
+
+// Archive current chat and clear messages
+export async function archiveAndClearChat(): Promise<void> {
+  const messages = await db.messages.toArray();
+  if (messages.length > 0) {
+    await db.archivedChats.add({
+      messages: messages.map(m => ({
+        role: m.role,
+        content: m.content,
+        timestamp: m.timestamp,
+      })),
+      archivedAt: new Date(),
+    });
+  }
+  await db.messages.clear();
+}
+
+// Get archived chats
+export async function getArchivedChats(limit: number = 10): Promise<ArchivedChat[]> {
+  return await db.archivedChats
+    .orderBy('archivedAt')
+    .reverse()
+    .limit(limit)
+    .toArray();
 }
