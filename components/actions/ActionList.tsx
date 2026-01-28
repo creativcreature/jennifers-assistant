@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { Action, db } from '@/lib/db';
-import { PRIORITY_ACTIONS } from '@/lib/actions';
+import { PRIORITY_ACTIONS, ACTIONS_VERSION } from '@/lib/actions';
 import ActionCard from './ActionCard';
+
+const ACTIONS_VERSION_KEY = 'jennifer_actions_version';
 
 export default function ActionList() {
   const [actions, setActions] = useState<Action[]>([]);
@@ -14,11 +16,29 @@ export default function ActionList() {
   useEffect(() => {
     async function loadActions() {
       try {
+        const storedVersion = localStorage.getItem(ACTIONS_VERSION_KEY);
+        const currentVersion = ACTIONS_VERSION.toString();
         let storedActions = await db.actions.toArray();
 
-        // Initialize with default actions if none exist
-        if (storedActions.length === 0) {
-          await db.actions.bulkAdd(PRIORITY_ACTIONS);
+        // Check if we need to update actions (new version or no actions)
+        if (storedActions.length === 0 || storedVersion !== currentVersion) {
+          // Preserve completion status of existing actions
+          const existingStatus = new Map<string, { status: Action['status']; completedAt?: Date; notes?: string }>();
+          storedActions.forEach(a => {
+            existingStatus.set(a.id, { status: a.status, completedAt: a.completedAt, notes: a.notes });
+          });
+
+          // Clear and re-add with preserved status
+          await db.actions.clear();
+          const updatedActions = PRIORITY_ACTIONS.map(action => {
+            const existing = existingStatus.get(action.id);
+            if (existing) {
+              return { ...action, ...existing };
+            }
+            return action;
+          });
+          await db.actions.bulkAdd(updatedActions);
+          localStorage.setItem(ACTIONS_VERSION_KEY, currentVersion);
           storedActions = await db.actions.toArray();
         }
 

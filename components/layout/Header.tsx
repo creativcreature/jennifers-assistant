@@ -173,21 +173,30 @@ export default function Header() {
             </button>
           )}
           <button
-            onClick={() => {
-              if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.getRegistrations().then(registrations => {
-                  registrations.forEach(r => r.update());
-                });
-              }
+            onClick={async () => {
               setMenuOpen(false);
+              // Clear actions version to force refresh
+              localStorage.removeItem('jennifer_actions_version');
+              // Unregister service worker and reload
+              if ('serviceWorker' in navigator) {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                await Promise.all(registrations.map(r => r.unregister()));
+              }
+              // Clear caches
+              if ('caches' in window) {
+                const keys = await caches.keys();
+                await Promise.all(keys.map(k => caches.delete(k)));
+              }
+              // Force reload from server
+              window.location.reload();
             }}
             className="flex items-center gap-4 px-5 py-4 text-lg w-full text-left transition-colors"
-            style={{ color: 'var(--text-secondary)' }}
+            style={{ color: 'var(--falcons-red)' }}
           >
             <span className="text-2xl">🔄</span>
             <div>
-              <div className="font-semibold">Refresh App</div>
-              <div className="text-sm" style={{ color: 'var(--text-muted)' }}>Check for updates</div>
+              <div className="font-semibold">Update App</div>
+              <div className="text-sm" style={{ color: 'var(--text-muted)' }}>Get latest version</div>
             </div>
           </button>
         </div>

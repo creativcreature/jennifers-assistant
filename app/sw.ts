@@ -2,6 +2,7 @@ import { defaultCache } from "@serwist/next/worker";
 import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
 import { Serwist } from "serwist";
 
+// SW Version 3 - Force update for new actions (prosthetics, housing, etc.)
 declare global {
   interface WorkerGlobalScope extends SerwistGlobalConfig {
     __SW_MANIFEST: (PrecacheEntry | string)[] | undefined;
@@ -13,7 +14,7 @@ declare const self: WorkerGlobalScope & typeof globalThis;
 
 const serwist = new Serwist({
   precacheEntries: self.__SW_MANIFEST,
-  skipWaiting: false, // Don't auto-update - let user control via UpdatePrompt
+  skipWaiting: true, // Auto-update immediately
   clientsClaim: true,
   navigationPreload: true,
   runtimeCaching: defaultCache,

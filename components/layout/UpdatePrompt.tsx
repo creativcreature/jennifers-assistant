@@ -11,8 +11,11 @@ export default function UpdatePrompt() {
       return;
     }
 
-    // Check for updates on page load
+    // Force check for updates immediately
     navigator.serviceWorker.ready.then((registration) => {
+      // Force update check
+      registration.update().catch(() => {});
+      
       // Check if there's already a waiting worker
       if (registration.waiting) {
         setWaitingWorker(registration.waiting);
@@ -36,8 +39,17 @@ export default function UpdatePrompt() {
 
     // Listen for controller change (happens when new SW takes over)
     navigator.serviceWorker.addEventListener('controllerchange', () => {
+      // Clear the actions version so they refresh
+      localStorage.removeItem('jennifer_actions_version');
       window.location.reload();
     });
+    
+    // Also check every 30 seconds for updates
+    const interval = setInterval(() => {
+      navigator.serviceWorker.ready.then((reg) => reg.update().catch(() => {}));
+    }, 30000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   function handleUpdate() {

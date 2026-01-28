@@ -1,5 +1,8 @@
 import { Action } from './db';
 
+// Increment this when actions are updated to force a refresh
+export const ACTIONS_VERSION = 3;
+
 export const PRIORITY_ACTIONS: Action[] = [
   {
     id: 'soar-worker',
