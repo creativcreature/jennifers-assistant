@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jennifer's Resources — Leg & Housing</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1a1a1a;
+      color: #fff;
+      font-size: 20px;
+      line-height: 1.6;
+      padding: 20px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    h1 { color: #A71930; font-size: 28px; margin-bottom: 8px; text-align: center; }
+    .subtitle { text-align: center; color: #999; margin-bottom: 24px; font-size: 16px; }
+    
+    .section {
+      background: #282828;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .section-title {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-title .emoji { font-size: 26px; }
+    
+    .resource {
+      background: #1e1e1e;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      border-left: 4px solid #2d6a4f;
+    }
+    .resource.priority { border-left-color: #A71930; }
+    .resource-name { font-weight: bold; font-size: 18px; margin-bottom: 6px; }
+    .resource-desc { color: #aaa; font-size: 16px; margin-bottom: 10px; }
+    
+    .call-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #2d6a4f 0%, #1b4332 100%);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 18px;
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+    .call-btn:active { transform: scale(0.98); }
+    .call-btn.red { background: linear-gradient(135deg, #A71930 0%, #8B1528 100%); }
+    .call-btn.blue { background: linear-gradient(135deg, #3d5a80 0%, #293241 100%); }
+    
+    .link-btn {
+      display: inline-block;
+      color: #A71930;
+      font-size: 16px;
+      text-decoration: underline;
+      margin-top: 8px;
+    }
+    
+    .tag {
+      display: inline-block;
+      background: rgba(45, 106, 79, 0.3);
+      color: #5cba8a;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    .tag.free { background: rgba(45, 106, 79, 0.3); color: #5cba8a; }
+    .tag.creative { background: rgba(167, 25, 48, 0.3); color: #ff6b7a; }
+    
+    .script {
+      background: #1a1a1a;
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 10px;
+      font-style: italic;
+      color: #ccc;
+      font-size: 16px;
+      border: 1px solid #333;
+    }
+    .script::before {
+      content: "📝 Say this:";
+      display: block;
+      font-style: normal;
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #A71930;
+      font-size: 14px;
+    }
+    
+    .nav-link {
+      display: block;
+      text-align: center;
+      padding: 16px;
+      background: #333;
+      border-radius: 12px;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      margin-top: 20px;
+    }
+    
+    .footer { text-align: center; color: #666; font-size: 14px; margin-top: 30px; padding: 20px; }
+  </style>
+</head>
+<body>
+
+<h1>🦿 Jennifer's Resources</h1>
+<p class="subtitle">Creative paths for prosthetics, housing & support</p>
+
+<!-- PROSTHETIC FOUNDATIONS -->
+<div class="section">
+  <div class="section-title"><span class="emoji">🦿</span> Free Prosthetic Help</div>
+  
+  <div class="resource priority">
+    <span class="tag free">FREE PROSTHETICS</span>
+    <div class="resource-name">Limbs for Life Foundation</div>
+    <div class="resource-desc">They cover the FULL COST of prosthetic care for qualified applicants.</div>
+    <a href="tel:+14058435174" class="call-btn">📞 (405) 843-5174</a>
+    <a href="https://www.limbsforlife.org/get-help/" class="link-btn" target="_blank">Apply Online →</a>
+    <div class="script">"Hi, I'm calling about prosthetic assistance. My mother is an amputee without insurance or resources. She's homeless in Atlanta."</div>
+  </div>
+  
+  <div class="resource">
+    <span class="tag free">FREE PROSTHETICS</span>
+    <div class="resource-name">Steps of Faith Foundation</div>
+    <div class="resource-desc">Provides prosthetic limbs to uninsured/underinsured amputees.</div>
+    <a href="https://www.stepsoffaithfoundation.org/apply" class="link-btn" target="_blank">Apply Online →</a>
+  </div>
+  
+  <div class="resource">
+    <div class="resource-name">Amputee Coalition</div>
+    <div class="resource-desc">Master resource list — connects to multiple assistance programs.</div>
+    <a href="https://amputee-coalition.org/resources/financial-assistance-for-prosthetic-services/" class="link-btn" target="_blank">Full Resource List →</a>
+  </div>
+  
+  <div class="resource">
+    <div class="resource-name">Shepherd Center (Atlanta)</div>
+    <div class="resource-desc">Top rehabilitation hospital — Atlanta-based, excellent for amputees.</div>
+    <a href="tel:+14043525338" class="call-btn">📞 (404) 352-5338</a>
+  </div>
+</div>
+
+<!-- HOUSING -->
+<div class="section">
+  <div class="section-title"><span class="emoji">🏠</span> Housing Programs</div>
+  
+  <div class="resource priority">
+    <span class="tag creative">RAPID REHOUSING</span>
+    <div class="resource-name">Partners for HOME</div>
+    <div class="resource-desc">Atlanta's official program to house homeless people FAST.</div>
+    <a href="tel:+14045323350" class="call-btn">📞 (404) 532-5350</a>
+    <div class="script">"Hi, my mother is homeless and staying at Frontline Response. She's an amputee and qualifies for disability. We need help getting into rapid rehousing."</div>
+  </div>
+  
+  <div class="resource">
+    <div class="resource-name">Atlanta Mission</div>
+    <div class="resource-desc">Shelter + transitional housing — multiple locations in Atlanta.</div>
+    <a href="tel:+14043673000" class="call-btn">📞 (404) 367-3000</a>
+  </div>
+  
+  <div class="resource">
+    <div class="resource-name">United Way Atlanta</div>
+    <div class="resource-desc">Financial assistance, emergency aid, resource connections.</div>
+    <a href="tel:211" class="call-btn">📞 Dial 211</a>
+  </div>
+</div>
+
+<!-- CONGRESSIONAL -->
+<div class="section">
+  <div class="section-title"><span class="emoji">🏛️</span> Congressional Help</div>
+  
+  <div class="resource priority">
+    <span class="tag creative">EXPEDITE SSI</span>
+    <div class="resource-name">Rep. Nikema Williams (GA-5)</div>
+    <div class="resource-desc">Congressional caseworkers can PUSH Social Security to move faster on stuck SSI claims.</div>
+    <a href="tel:+14046590116" class="call-btn red">📞 (404) 659-0116</a>
+    <div class="script">"Hi, I'm calling on behalf of my mother Jennifer. She's homeless, an amputee, and her SSI application is stuck. We need help from a caseworker to push this through Social Security."</div>
+  </div>
+  
+  <div class="resource">
+    <div class="resource-name">Sen. Jon Ossoff</div>
+    <div class="resource-desc">Another option for federal agency pressure.</div>
+    <a href="tel:+14046092040" class="call-btn">📞 (404) 609-2040</a>
+  </div>
+</div>
+
+<!-- CREATIVE OUTREACH -->
+<div class="section">
+  <div class="section-title"><span class="emoji">📺</span> Creative Outreach</div>
+  
+  <div class="resource">
+    <span class="tag creative">MEDIA STORY</span>
+    <div class="resource-name">Atlanta News Stations</div>
+    <div class="resource-desc">A lifelong Falcons fan, amputee, homeless — this story has heart. Local news loves these.</div>
+    <a href="mailto:tips@11alive.com" class="call-btn blue">✉️ 11Alive</a>
+    <a href="mailto:talk2us@wsbtv.com" class="call-btn blue">✉️ WSB-TV</a>
+  </div>
+  
+  <div class="resource">
+    <span class="tag creative">FALCONS FAN</span>
+    <div class="resource-name">Atlanta Falcons Community</div>
+    <div class="resource-desc">Jennifer is a lifelong Falcons fan. The team does community outreach.</div>
+    <a href="mailto:community@atlantafalcons.com" class="call-btn red">✉️ Falcons Community</a>
+  </div>
+</div>
+
+<a href="/JENNIFER_GUIDE.html" class="nav-link">← Back to Action Guide</a>
+<a href="/nfl" class="nav-link">🏈 Falcons News & Videos</a>
+
+<div class="footer">
+  Rise Up, Jennifer! 🏈<br>
+  Made with love by your family
+</div>
+
+</body>
+</html>
