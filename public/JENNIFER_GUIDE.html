@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jennifer's Action Guide</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+            font-size: 20px;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #A71930;
+            font-size: 28px;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        .subtitle {
+            text-align: center;
+            color: #999;
+            margin-bottom: 24px;
+            font-size: 16px;
+        }
+        .section {
+            background: #282828;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title .emoji { font-size: 26px; }
+        .action-item {
+            background: #1e1e1e;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-left: 4px solid #A71930;
+        }
+        .action-item.done {
+            border-left-color: #2d6a4f;
+            opacity: 0.7;
+        }
+        .action-title {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .action-desc {
+            color: #aaa;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .call-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #A71930 0%, #8B1528 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 18px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        .call-btn:active { transform: scale(0.98); }
+        .call-btn.green {
+            background: linear-gradient(135deg, #2d6a4f 0%, #1b4332 100%);
+        }
+        .link-btn {
+            display: inline-block;
+            color: #A71930;
+            font-size: 16px;
+            text-decoration: underline;
+            margin-top: 8px;
+        }
+        .nav-link {
+            display: block;
+            text-align: center;
+            padding: 16px;
+            background: #333;
+            border-radius: 12px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+        .footer {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-top: 30px;
+            padding: 20px;
+        }
+        .highlight {
+            background: rgba(167, 25, 48, 0.2);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            border-left: 3px solid #A71930;
+        }
+        .time-badge {
+            display: inline-block;
+            background: #A71930;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #666;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+        }
+        .progress-bar {
+            background: #333;
+            border-radius: 10px;
+            height: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            background: linear-gradient(90deg, #A71930, #d4405a);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <h1>📋 Jennifer's Action Guide</h1>
+    <p class="subtitle">Morning tasks — Rise Up! 🏈</p>
+
+    <div class="highlight">
+        <strong>Last updated:</strong> February 9, 2026<br>
+        <strong>Status:</strong> Active support in progress
+    </div>
+
+    <!-- TODAY'S PRIORITIES -->
+    <div class="section">
+        <div class="section-title"><span class="emoji">🔥</span> Today's Priority Calls</div>
+
+        <div class="action-item">
+            <span class="time-badge">#1 PRIORITY</span>
+            <div class="action-title">🏛️ Call Congressional Caseworker</div>
+            <div class="action-desc">Rep. Nikema Williams can push SSI through Social Security</div>
+            <a href="tel:+14046590116" class="call-btn">📞 (404) 659-0116</a>
+        </div>
+
+        <div class="action-item">
+            <span class="time-badge">#2</span>
+            <div class="action-title">🏠 Partners for HOME</div>
+            <div class="action-desc">Rapid rehousing program — Atlanta's official housing assistance</div>
+            <a href="tel:+14045323350" class="call-btn green">📞 (404) 532-5350</a>
+        </div>
+
+        <div class="action-item">
+            <span class="time-badge">#3</span>
+            <div class="action-title">🦿 Limbs for Life Foundation</div>
+            <div class="action-desc">Free prosthetic care for qualified applicants</div>
+            <a href="tel:+14058435174" class="call-btn green">📞 (405) 843-5174</a>
+        </div>
+    </div>
+
+    <!-- ONLINE APPLICATIONS -->
+    <div class="section">
+        <div class="section-title"><span class="emoji">📝</span> Applications to Submit</div>
+
+        <div class="action-item">
+            <div class="action-title">Steps of Faith Foundation</div>
+            <div class="action-desc">Free prosthetic limbs for uninsured/underinsured amputees</div>
+            <a href="https://www.stepsoffaithfoundation.org/apply" class="link-btn" target="_blank">Apply Online →</a>
+        </div>
+
+        <div class="action-item">
+            <div class="action-title">Amputee Coalition Resources</div>
+            <div class="action-desc">Master list of financial assistance for prosthetics</div>
+            <a href="https://amputee-coalition.org/resources/financial-assistance-for-prosthetic-services/" class="link-btn" target="_blank">View Resources →</a>
+        </div>
+    </div>
+
+    <!-- QUICK LINKS -->
+    <div class="section">
+        <div class="section-title"><span class="emoji">🔗</span> Quick Links</div>
+        <p style="margin-bottom: 16px; color: #aaa;">Full resources with phone scripts, creative outreach, and more:</p>
+        <a href="/JENNIFER_RESOURCES.html" class="nav-link">🦿 View All Resources →</a>
+        <a href="/nfl" class="nav-link">🏈 Falcons News & Videos</a>
+    </div>
+
+    <div class="footer">
+        Rise Up, Jennifer! 🏈<br>
+        Made with love by your family
+    </div>
+</body>
+</html>
